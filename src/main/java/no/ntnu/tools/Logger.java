@@ -2,15 +2,12 @@ package no.ntnu.tools;
 
 /**
  * A logger class for encapsulating all the logging. We can either reduce the number of SonarLint
- * warnings, or implement it properly. This class makes sure we sue the same logging in all
- * places of our code.
+ * warnings, or implement it properly. This class makes sure we sue the same logging in all places
+ * of our code.
  */
 public class Logger {
-  /**
-   * Not allowed to create an instance of this class.
-   */
-  private Logger() {
-  }
+  /** Not allowed to create an instance of this class. */
+  private Logger() {}
 
   /**
    * Log an information message.

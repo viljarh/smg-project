@@ -3,6 +3,7 @@ package no.ntnu.gui.greenhouse;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -60,5 +61,4 @@ public class MainGreenhouseGuiWindow extends Scene {
     }
     return node;
   }
-
 }
