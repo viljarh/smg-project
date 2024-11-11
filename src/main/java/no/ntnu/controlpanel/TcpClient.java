@@ -75,7 +75,7 @@ public class TcpClient implements CommunicationChannel {
   private String determineUnit(String type) {
     switch (type.toLowerCase()) {
       case "temperature":
-        return "°C";
+        return "C";
       case "humidity":
         return "%";
       case "light":
