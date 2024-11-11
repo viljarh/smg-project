@@ -1,8 +1,6 @@
 package no.ntnu.greenhouse;
 
-/**
- * A sensor which can sense the environment in a specific way.
- */
+/** A sensor which can sense the environment in a specific way. */
 public class Sensor {
   private final SensorReading reading;
   private final double min;
@@ -11,11 +9,11 @@ public class Sensor {
   /**
    * Create a sensor.
    *
-   * @param type    The type of the sensor. Examples: "temperature", "humidity"
-   * @param min     Minimum allowed value
-   * @param max     Maximum allowed value
+   * @param type The type of the sensor. Examples: "temperature", "humidity"
+   * @param min Minimum allowed value
+   * @param max Maximum allowed value
    * @param current The current (starting) value of the sensor
-   * @param unit    The measurement unit. Examples: "%", "C", "lux"
+   * @param unit The measurement unit. Examples: "%", "C", "lux"
    */
   public Sensor(String type, double min, double max, double current, String unit) {
     this.reading = new SensorReading(type, current, unit);
@@ -43,13 +41,15 @@ public class Sensor {
    * @return A clone of this sensor, where all the fields are the same
    */
   public Sensor createClone() {
-    return new Sensor(this.reading.getType(), this.min, this.max,
-        this.reading.getValue(), this.reading.getUnit());
+    return new Sensor(
+        this.reading.getType(),
+        this.min,
+        this.max,
+        this.reading.getValue(),
+        this.reading.getUnit());
   }
 
-  /**
-   * Add a random noise to the sensors to simulate realistic values.
-   */
+  /** Add a random noise to the sensors to simulate realistic values. */
   public void addRandomNoise() {
     double newValue = this.reading.getValue() + generateRealisticNoise();
     ensureValueBoundsAndPrecision(newValue);
@@ -65,6 +65,7 @@ public class Sensor {
     reading.setValue(newValue);
   }
 
+  /** Rounds up to two decimals */
   private double roundToTwoDecimals(double value) {
     return Math.round(value * 100.0) / 100.0;
   }

@@ -1,6 +1,7 @@
 package no.ntnu.gui.greenhouse;
 
 import java.util.List;
+
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
@@ -63,7 +64,6 @@ public class NodeGuiWindow extends Stage implements SensorListener, ActuatorList
     sensorPane = new SensorPane(node.getSensors());
     return new VBox(sensorPane, actuatorPane);
   }
-
 
   @Override
   public void sensorsUpdated(List<Sensor> sensors) {
