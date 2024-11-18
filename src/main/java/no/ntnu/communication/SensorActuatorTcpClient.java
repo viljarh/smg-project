@@ -26,7 +26,6 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
     private PrintWriter output;
     private BufferedReader input;
     private boolean isRunning;
-    private ActuatorListener actuatorListener;
 
     public SensorActuatorTcpClient(SensorActuatorNode node) {
         this.node = node;
@@ -69,7 +68,7 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
                 first = false;
             }
         }
-        output.println(nodeInfo.toString());
+        output.println(nodeInfo);
         Logger.info("Node " + node.getId() + " sent ready notification: " + nodeInfo);
     }
 

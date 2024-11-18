@@ -1,7 +1,5 @@
 package no.ntnu.run;
 
-import javafx.application.*;
-
 import no.ntnu.gui.greenhouse.GreenhouseApplication;
 import no.ntnu.tools.Logger;
 

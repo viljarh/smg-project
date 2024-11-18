@@ -15,7 +15,6 @@ import no.ntnu.tools.Logger;
 public class TcpServer {
     public static final int PORT_NUMBER = 10025;
     private boolean isServerRunning;
-    private final List<ClientHandler> nodeClients = new ArrayList<>();
     private final List<ClientHandler> controlPanelClients = new ArrayList<>();
     private final Map<Integer, SensorActuatorNode> nodes;
     private final List<ClientHandler> connectedClients = new ArrayList<>();

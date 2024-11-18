@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.Map;
 
 import no.ntnu.greenhouse.SensorActuatorNode;
-import no.ntnu.message.Message;
+import no.ntnu.tools.Logger;
 
 public class ClientHandler extends Thread {
     private final Socket clientSocket;
@@ -30,7 +30,7 @@ public class ClientHandler extends Thread {
                 handleMessage(message);
             }
         } catch (IOException e) {
-            System.err.println("Error handling client: " + e.getMessage());
+            Logger.error("Error handling client: " + e.getMessage());
         } finally {
             closeConnection();
         }
@@ -40,6 +40,9 @@ public class ClientHandler extends Thread {
         String[] parts = message.split(";");
         if (parts.length >= 1) {
             switch (parts[0]) {
+                default:
+                    Logger.error("Unknown message type: " + parts[0]);
+                    break;
                 case "CONTROL_PANEL_CONNECT":
                     server.registerControlPanel(this);
                     break;
@@ -57,7 +60,7 @@ public class ClientHandler extends Thread {
     }
 
     public void sendMessage(String message) {
-        output.println(message.toString());
+        output.println(message);
     }
 
     private void closeConnection() {
@@ -65,7 +68,7 @@ public class ClientHandler extends Thread {
             server.removeClient(this);
             clientSocket.close();
         } catch (IOException e) {
-            System.err.println("Error closing client connection: " + e.getMessage());
+            Logger.error("Error closing client connection: " + e.getMessage());
         }
     }
 }
