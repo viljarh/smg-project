@@ -151,7 +151,6 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
 
     @Override
 public void onNodeReady(SensorActuatorNode node) {
-    // Remove any code that throws UnsupportedOperationException
     Logger.info("Node " + node.getId() + " is ready.");
 }
 
@@ -159,6 +158,5 @@ public void onNodeReady(SensorActuatorNode node) {
     public void onNodeStopped(SensorActuatorNode node) {
         // Implementation for when a node stops
         Logger.info("Node " + node.getId() + " has stopped.");
-        // Add any additional cleanup if necessary
     }
 }

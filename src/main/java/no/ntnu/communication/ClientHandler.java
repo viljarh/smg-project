@@ -57,7 +57,6 @@ public class ClientHandler extends Thread {
     }
 
     public void sendMessage(String message) {
-        // TODO: Implement message serialization
         output.println(message.toString());
     }
 
