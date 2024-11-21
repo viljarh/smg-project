@@ -74,7 +74,7 @@ public class DeviceFactory {
    */
   public static Sensor createTemperatureSensor() {
     return new Sensor(SENSOR_TYPE_TEMPERATURE, MIN_TEMPERATURE, MAX_TEMPERATURE,
-        randomize(NORMAL_GREENHOUSE_TEMPERATURE, 1.0), TEMPERATURE_UNIT);
+            randomize(NORMAL_GREENHOUSE_TEMPERATURE, 1.0), TEMPERATURE_UNIT);
   }
 
   /**
@@ -84,7 +84,7 @@ public class DeviceFactory {
    */
   public static Sensor createHumiditySensor() {
     return new Sensor("humidity", MIN_HUMIDITY, MAX_HUMIDITY,
-        randomize(NORMAL_GREENHOUSE_HUMIDITY, 5.0), HUMIDITY_UNIT);
+            randomize(NORMAL_GREENHOUSE_HUMIDITY, 5.0), HUMIDITY_UNIT);
   }
 
   /**

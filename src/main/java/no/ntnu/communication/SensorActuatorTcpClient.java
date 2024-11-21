@@ -48,23 +48,23 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
     private void sendNodeInfo() {
         StringBuilder nodeInfo = new StringBuilder();
         nodeInfo.append("NODE_READY;")
-               .append(node.getId());
-        
+                .append(node.getId());
+
         ActuatorCollection actuators = node.getActuators();
         if (actuators.size() > 0) {
             nodeInfo.append(";");
             Map<String, Integer> actuatorCounts = new HashMap<>();
-            actuators.forEach(actuator -> 
-                actuatorCounts.merge(actuator.getType(), 1, Integer::sum));
-            
+            actuators.forEach(actuator ->
+                    actuatorCounts.merge(actuator.getType(), 1, Integer::sum));
+
             boolean first = true;
             for (Map.Entry<String, Integer> entry : actuatorCounts.entrySet()) {
                 if (!first) {
                     nodeInfo.append(",");
                 }
                 nodeInfo.append(entry.getValue())
-                       .append("_")
-                       .append(entry.getKey());
+                        .append("_")
+                        .append(entry.getKey());
                 first = false;
             }
         }
@@ -103,10 +103,10 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
                 sb.append(",");
             }
             sb.append(sensor.getType())
-              .append("=")
-              .append(sensor.getReading().getValue())
-              .append(" ")
-              .append(sensor.getReading().getUnit());
+                    .append("=")
+                    .append(sensor.getReading().getValue())
+                    .append(" ")
+                    .append(sensor.getReading().getUnit());
         }
         return sb.toString();
     }
@@ -114,8 +114,8 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
     @Override
     public void actuatorUpdated(int nodeId, Actuator actuator) {
         if (output != null) {
-            String message = String.format("ACTUATOR_STATE;%d;%d;%b", 
-                nodeId, actuator.getId(), actuator.isOn());
+            String message = String.format("ACTUATOR_STATE;%d;%d;%b",
+                    nodeId, actuator.getId(), actuator.isOn());
             output.println(message);
             Logger.info("Node " + nodeId + " sent actuator update: " + message);
         }
@@ -149,9 +149,9 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
     }
 
     @Override
-public void onNodeReady(SensorActuatorNode node) {
-    Logger.info("Node " + node.getId() + " is ready.");
-}
+    public void onNodeReady(SensorActuatorNode node) {
+        Logger.info("Node " + node.getId() + " is ready.");
+    }
 
     @Override
     public void onNodeStopped(SensorActuatorNode node) {

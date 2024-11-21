@@ -63,8 +63,8 @@ public class SensorReading {
     }
     SensorReading that = (SensorReading) o;
     return Double.compare(value, that.value) == 0
-        && Objects.equals(type, that.type)
-        && Objects.equals(unit, that.unit);
+            && Objects.equals(type, that.type)
+            && Objects.equals(unit, that.unit);
   }
 
   @Override
