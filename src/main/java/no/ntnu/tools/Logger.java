@@ -6,36 +6,36 @@ package no.ntnu.tools;
  * places of our code.
  */
 public class Logger {
-  /**
-   * Not allowed to create an instance of this class.
-   */
-  private Logger() {
-  }
+    /**
+     * Not allowed to create an instance of this class.
+     */
+    private Logger() {
+    }
 
-  /**
-   * Log an information message.
-   *
-   * @param message The message to log. A newline is appended automatically.
-   */
-  public static void info(String message) {
-    System.out.println(message);
-  }
+    /**
+     * Log an information message.
+     *
+     * @param message The message to log. A newline is appended automatically.
+     */
+    public static void info(String message) {
+        System.out.println(message);
+    }
 
-  /**
-   * Log an info message without appending a newline to the log.
-   *
-   * @param message The message to log
-   */
-  public static void infoNoNewline(String message) {
-    System.out.print(message);
-  }
+    /**
+     * Log an info message without appending a newline to the log.
+     *
+     * @param message The message to log
+     */
+    public static void infoNoNewline(String message) {
+        System.out.print(message);
+    }
 
-  /**
-   * Log an error message.
-   *
-   * @param message The error message to log
-   */
-  public static void error(String message) {
-    System.err.println(message);
-  }
+    /**
+     * Log an error message.
+     *
+     * @param message The error message to log
+     */
+    public static void error(String message) {
+        System.err.println(message);
+    }
 }

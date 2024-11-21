@@ -20,76 +20,76 @@ import no.ntnu.tools.Logger;
  * though you may have no real control-panel logic in your projects.
  */
 public class ControlPanelLogic implements GreenhouseEventListener, ActuatorListener,
-    CommunicationChannelListener {
-  private final List<GreenhouseEventListener> listeners = new LinkedList<>();
+        CommunicationChannelListener {
+    private final List<GreenhouseEventListener> listeners = new LinkedList<>();
 
-  private CommunicationChannel communicationChannel;
-  private CommunicationChannelListener communicationChannelListener;
+    private CommunicationChannel communicationChannel;
+    private CommunicationChannelListener communicationChannelListener;
 
-  /**
-   * Set the channel over which control commands will be sent to sensor/actuator nodes.
-   *
-   * @param communicationChannel The communication channel, the event sender
-   */
-  public void setCommunicationChannel(CommunicationChannel communicationChannel) {
-    this.communicationChannel = communicationChannel;
-  }
-
-  /**
-   * Set listener which will get notified when communication channel is closed.
-   *
-   * @param listener The listener
-   */
-  public void setCommunicationChannelListener(CommunicationChannelListener listener) {
-    this.communicationChannelListener = listener;
-  }
-
-  /**
-   * Add an event listener.
-   *
-   * @param listener The listener who will be notified on all events
-   */
-  public void addListener(GreenhouseEventListener listener) {
-    if (!listeners.contains(listener)) {
-      listeners.add(listener);
+    /**
+     * Set the channel over which control commands will be sent to sensor/actuator nodes.
+     *
+     * @param communicationChannel The communication channel, the event sender
+     */
+    public void setCommunicationChannel(CommunicationChannel communicationChannel) {
+        this.communicationChannel = communicationChannel;
     }
-  }
 
-  @Override
-  public void onNodeAdded(SensorActuatorNodeInfo nodeInfo) {
-    listeners.forEach(listener -> listener.onNodeAdded(nodeInfo));
-  }
-
-  @Override
-  public void onNodeRemoved(int nodeId) {
-    listeners.forEach(listener -> listener.onNodeRemoved(nodeId));
-  }
-
-  @Override
-  public void onSensorData(int nodeId, List<SensorReading> sensors) {
-    listeners.forEach(listener -> listener.onSensorData(nodeId, sensors));
-  }
-
-  @Override
-  public void onActuatorStateChanged(int nodeId, int actuatorId, boolean isOn) {
-    listeners.forEach(listener -> listener.onActuatorStateChanged(nodeId, actuatorId, isOn));
-  }
-
-  @Override
-  public void actuatorUpdated(int nodeId, Actuator actuator) {
-    if (communicationChannel != null) {
-      communicationChannel.sendActuatorChange(nodeId, actuator.getId(), actuator.isOn());
+    /**
+     * Set listener which will get notified when communication channel is closed.
+     *
+     * @param listener The listener
+     */
+    public void setCommunicationChannelListener(CommunicationChannelListener listener) {
+        this.communicationChannelListener = listener;
     }
-    listeners.forEach(listener ->
-        listener.onActuatorStateChanged(nodeId, actuator.getId(), actuator.isOn())
-    );
-  }
 
-  @Override
-  public void onCommunicationChannelClosed() {
-    Logger.info("Communication closed, updating logic...");
-    if (communicationChannelListener != null) {
-      communicationChannelListener.onCommunicationChannelClosed();
+    /**
+     * Add an event listener.
+     *
+     * @param listener The listener who will be notified on all events
+     */
+    public void addListener(GreenhouseEventListener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
     }
-  }
+
+    @Override
+    public void onNodeAdded(SensorActuatorNodeInfo nodeInfo) {
+        listeners.forEach(listener -> listener.onNodeAdded(nodeInfo));
+    }
+
+    @Override
+    public void onNodeRemoved(int nodeId) {
+        listeners.forEach(listener -> listener.onNodeRemoved(nodeId));
+    }
+
+    @Override
+    public void onSensorData(int nodeId, List<SensorReading> sensors) {
+        listeners.forEach(listener -> listener.onSensorData(nodeId, sensors));
+    }
+
+    @Override
+    public void onActuatorStateChanged(int nodeId, int actuatorId, boolean isOn) {
+        listeners.forEach(listener -> listener.onActuatorStateChanged(nodeId, actuatorId, isOn));
+    }
+
+    @Override
+    public void actuatorUpdated(int nodeId, Actuator actuator) {
+        if (communicationChannel != null) {
+            communicationChannel.sendActuatorChange(nodeId, actuator.getId(), actuator.isOn());
+        }
+        listeners.forEach(listener ->
+                listener.onActuatorStateChanged(nodeId, actuator.getId(), actuator.isOn())
+        );
+    }
+
+    @Override
+    public void onCommunicationChannelClosed() {
+        Logger.info("Communication closed, updating logic...");
+        if (communicationChannelListener != null) {
+            communicationChannelListener.onCommunicationChannelClosed();
+        }
+    }
 }
