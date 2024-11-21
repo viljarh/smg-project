@@ -8,12 +8,11 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TcpServer {
   private ServerSocket serverSocket;
-  private Socket clientSocket;
-  private ObjectOutputStream outputStream;
-  private ObjectInputStream inputStream;
+  private final CopyOnWriteArrayList<Socket> clientSockets = new CopyOnWriteArrayList<>();
   private final Map<Integer, SensorActuatorNode> nodes;
   private Timer sensorDataTimer;
 
@@ -22,26 +21,31 @@ public class TcpServer {
     this.nodes = nodes;
     System.out.println("Greenhouse server started on port " + port);
     waitForClientConnection();
+    startSendingSensorData();
   }
 
   private void waitForClientConnection() {
-    try {
-      clientSocket = serverSocket.accept();
-      System.out.println("Client connected: " + clientSocket.getInetAddress());
-      outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-      inputStream = new ObjectInputStream(clientSocket.getInputStream());
-
-      startListening();
-      startSendingSensorData();
-    } catch (IOException e) {
-      System.err.println("Error accepting client: " + e.getMessage());
-    }
-  }
-
-  private void startListening() {
     new Thread(
             () -> {
               try {
+                while (true) {
+                  Socket clientSocket = serverSocket.accept();
+                  clientSockets.add(clientSocket);
+                  System.out.println("Client connected: " + clientSocket.getInetAddress());
+                  startListening(clientSocket);
+                }
+              } catch (IOException e) {
+                System.err.println("Error accepting client: " + e.getMessage());
+              }
+            })
+        .start();
+  }
+
+  private void startListening(Socket clientSocket) {
+    new Thread(
+            () -> {
+              try (ObjectInputStream inputStream =
+                  new ObjectInputStream(clientSocket.getInputStream())) {
                 while (true) {
                   String command = (String) inputStream.readObject();
                   System.out.println("Received command from client: " + command);
@@ -49,8 +53,7 @@ public class TcpServer {
                 }
               } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Client disconnected or error: " + e.getMessage());
-              } finally {
-                closeConnection();
+                clientSockets.remove(clientSocket);
               }
             })
         .start();
@@ -65,7 +68,7 @@ public class TcpServer {
             try {
               for (SensorActuatorNode node : nodes.values()) {
                 String sensorData = formatSensorData(node);
-                sendSensorData(sensorData);
+                broadcastSensorData(sensorData);
               }
             } catch (IOException e) {
               System.err.println("Error sending sensor data to client: " + e.getMessage());
@@ -108,9 +111,17 @@ public class TcpServer {
     }
   }
 
-  private void sendSensorData(String data) throws IOException {
-    outputStream.writeObject(data);
-    outputStream.flush();
+  private void broadcastSensorData(String data) throws IOException {
+    for (Socket clientSocket : clientSockets) {
+      try {
+        ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+        outputStream.writeObject(data);
+        outputStream.flush();
+      } catch (Exception e) {
+        System.err.println("Error broadcasting to client: " + clientSocket.getInetAddress());
+        clientSockets.remove(clientSocket);
+      }
+    }
   }
 
   public void stop() {
@@ -118,21 +129,18 @@ public class TcpServer {
       if (sensorDataTimer != null) {
         sensorDataTimer.cancel();
       }
-      if (clientSocket != null) {
-        clientSocket.close();
-      }
-      if (serverSocket != null) {
-        serverSocket.close();
-      }
-    } catch (IOException e) {
-      System.err.println("Error stopping TcpServer: " + e.getMessage());
+      closeConnection();
+    } catch (Exception e) {
+      System.err.println("Error stopping TCP server: " + e.getMessage());
     }
   }
 
   private void closeConnection() {
     try {
-      if (clientSocket != null) {
-        clientSocket.close();
+      for (Socket clientSocket : clientSockets) {
+        if (clientSocket != null) {
+          clientSocket.close();
+        }
       }
       if (serverSocket != null) {
         serverSocket.close();
