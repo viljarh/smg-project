@@ -39,22 +39,42 @@ public class TcpClient implements CommunicationChannel {
   private void startListening() {
     new Thread(
             () -> {
-              try {
-                while (!socket.isClosed()) {
+              while (true) {
+                try {
+                  if (socket == null || socket.isClosed()) {
+                    System.err.println("Connection lost. Attempting to reconnect.");
+                    boolean connected = open();
+                    if (!connected) {
+                      Thread.sleep(5000);
+                      continue;
+                    }
+                  }
                   String data = (String) inputStream.readObject();
                   processData(data);
+                } catch (IOException | ClassNotFoundException | InterruptedException e) {
+                  System.err.println("Error receiving data or reconnecting: " + e.getMessage());
                 }
-              } catch (IOException | ClassNotFoundException e) {
-                System.err.println("Error receiving data: " + e.getMessage());
               }
             })
         .start();
   }
 
   private void processData(String data) {
-    int nodeId = 1;
-    List<SensorReading> sensorReadings = parseSensorData(data);
-    logic.onSensorData(nodeId, sensorReadings);
+    // int nodeId = 1;
+    // List<SensorReading> sensorReadings = parseSensorData(data);
+    // logic.onSensorData(nodeId, sensorReadings);
+    String[] mainParts = data.split(": ");
+    if (mainParts.length == 2) {
+      try {
+        int nodeId = Integer.parseInt(mainParts[0].replace("Node ", "").trim());
+        List<SensorReading> sensorReadings = parseSensorData(mainParts[1]);
+        logic.onSensorData(nodeId, sensorReadings);
+      } catch (NumberFormatException e) {
+        System.err.println("Error parsing node ID from data: " + data);
+      }
+    } else {
+      System.err.println("Unexpected data format: " + data);
+    }
   }
 
   private List<SensorReading> parseSensorData(String data) {
