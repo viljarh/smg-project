@@ -4,7 +4,6 @@ package no.ntnu.message;
  * Serializes messages to protocol-defined strings and vice versa.
  */
 public class MessageSerializer {
-    // Message types
     public static final String CONTROL_PANEL_CONNECT = "CONTROL_PANEL_CONNECT";
     public static final String NODE_READY = "NODE_READY";
     public static final String SENSOR_DATA = "SENSOR_DATA";
@@ -100,16 +99,6 @@ public class MessageSerializer {
         } catch (NumberFormatException e) {
             return new ErrorMessage("Invalid number in actuator state message");
         }
-    }
-
-    private static Integer parseInteger(String s) {
-        Integer i = null;
-        try {
-            i = Integer.valueOf(s);
-        } catch (NumberFormatException e) {
-            System.err.println("Could not parse integer <" + s + ">");
-        }
-        return i;
     }
 
     /**
