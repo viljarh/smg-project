@@ -32,7 +32,7 @@ public class SensorPane extends TitledPane {
   private void initialize(Iterable<SensorReading> sensors) {
     setText("Sensors");
     sensors.forEach(sensor ->
-        contentBox.getChildren().add(createAndRememberSensorLabel(sensor))
+            contentBox.getChildren().add(createAndRememberSensorLabel(sensor))
     );
     setContent(contentBox);
   }

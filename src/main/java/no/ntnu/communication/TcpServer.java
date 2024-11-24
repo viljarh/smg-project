@@ -29,7 +29,7 @@ public class TcpServer {
             serverSocket = new ServerSocket(PORT_NUMBER);
             isServerRunning = true;
             Logger.info("Server listening on port " + PORT_NUMBER);
-            
+
             while (isServerRunning) {
                 acceptNextClient();
             }
@@ -80,20 +80,20 @@ public class TcpServer {
     private String formatNodeInfo(SensorActuatorNode node) {
         StringBuilder info = new StringBuilder();
         info.append(node.getId());
-        
+
         ActuatorCollection actuators = node.getActuators();
         if (actuators.size() > 0) {
             info.append(";");
             Map<String, Integer> actuatorCounts = new HashMap<>();
-            actuators.forEach(actuator -> 
-                actuatorCounts.merge(actuator.getType(), 1, Integer::sum));
-            
+            actuators.forEach(actuator ->
+                    actuatorCounts.merge(actuator.getType(), 1, Integer::sum));
+
             boolean first = true;
             for (Map.Entry<String, Integer> entry : actuatorCounts.entrySet()) {
                 if (!first) info.append(",");
                 info.append(entry.getValue())
-                    .append("_")
-                    .append(entry.getKey());
+                        .append("_")
+                        .append(entry.getKey());
                 first = false;
             }
         }

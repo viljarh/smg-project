@@ -40,7 +40,7 @@ public class ActuatorPane extends TitledPane {
 
   private void addActuatorControls(ActuatorCollection actuators, Pane parent) {
     actuators.forEach(actuator ->
-        parent.getChildren().add(createActuatorGui(actuator))
+            parent.getChildren().add(createActuatorGui(actuator))
     );
   }
 

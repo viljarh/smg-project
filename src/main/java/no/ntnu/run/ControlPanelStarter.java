@@ -13,53 +13,53 @@ import no.ntnu.tools.Logger;
  * debugger (JavaFX modules not found)
  */
 public class ControlPanelStarter {
-  private final boolean fake;
+    private final boolean fake;
 
-  public ControlPanelStarter(boolean fake) {
-      this.fake = fake;
-  }
+    public ControlPanelStarter(boolean fake) {
+        this.fake = fake;
+    }
 
-  public static void main(String[] args) {
-      boolean fake = false;
-      if (args.length == 1 && "fake".equals(args[0])) {
-          fake = true;
-          Logger.info("Using FAKE events");
-      }
-      ControlPanelStarter starter = new ControlPanelStarter(fake);
-      starter.start();
-  }
+    public static void main(String[] args) {
+        boolean fake = false;
+        if (args.length == 1 && "fake".equals(args[0])) {
+            fake = true;
+            Logger.info("Using FAKE events");
+        }
+        ControlPanelStarter starter = new ControlPanelStarter(fake);
+        starter.start();
+    }
 
-  private void start() {
-      ControlPanelLogic logic = new ControlPanelLogic();
-      CommunicationChannel channel = initiateCommunication(logic, fake);
-      ControlPanelApplication.startApp(logic, channel);
-      Logger.info("Exiting the control panel application");
-      stopCommunication();
-  }
+    private void start() {
+        ControlPanelLogic logic = new ControlPanelLogic();
+        CommunicationChannel channel = initiateCommunication(logic, fake);
+        ControlPanelApplication.startApp(logic, channel);
+        Logger.info("Exiting the control panel application");
+        stopCommunication();
+    }
 
-  private CommunicationChannel initiateCommunication(ControlPanelLogic logic, boolean fake) {
-      CommunicationChannel channel;
-      if (fake) {
-          channel = initiateFakeSpawner(logic);
-      } else {
-          channel = initiateSocketCommunication(logic);
-      }
-      return channel;
-  }
+    private CommunicationChannel initiateCommunication(ControlPanelLogic logic, boolean fake) {
+        CommunicationChannel channel;
+        if (fake) {
+            channel = initiateFakeSpawner(logic);
+        } else {
+            channel = initiateSocketCommunication(logic);
+        }
+        return channel;
+    }
 
-  private CommunicationChannel initiateSocketCommunication(ControlPanelLogic logic) {
-      ControlPanelTcpClient client = new ControlPanelTcpClient(logic);
-      logic.setCommunicationChannel(client);
-      return client;
-  }
+    private CommunicationChannel initiateSocketCommunication(ControlPanelLogic logic) {
+        ControlPanelTcpClient client = new ControlPanelTcpClient(logic);
+        logic.setCommunicationChannel(client);
+        return client;
+    }
 
-  private CommunicationChannel initiateFakeSpawner(ControlPanelLogic logic) {
-      FakeCommunicationChannel spawner = new FakeCommunicationChannel(logic);
-      logic.setCommunicationChannel(spawner);
-      return spawner;
-  }
+    private CommunicationChannel initiateFakeSpawner(ControlPanelLogic logic) {
+        FakeCommunicationChannel spawner = new FakeCommunicationChannel(logic);
+        logic.setCommunicationChannel(spawner);
+        return spawner;
+    }
 
-  private void stopCommunication() {
-      // TODO - here you stop the TCP/UDP socket communication
-  }
+    private void stopCommunication() {
+        // TODO - here you stop the TCP/UDP socket communication
+    }
 }

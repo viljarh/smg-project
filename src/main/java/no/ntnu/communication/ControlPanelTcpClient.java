@@ -25,22 +25,22 @@ public class ControlPanelTcpClient implements CommunicationChannel {
     }
 
     @Override
-public boolean open() {
-    try {
-        socket = new Socket(SERVER_HOST, SERVER_PORT);
-        output = new PrintWriter(socket.getOutputStream(), true);
-        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        // Identify as control panel
-        output.println("CONTROL_PANEL_CONNECT");
-        isRunning = true;
-        startListening();
-        Logger.info("Control panel connected to server");
-        return true;
-    } catch (IOException e) {
-        Logger.error("Could not connect to server: " + e.getMessage());
-        return false;
+    public boolean open() {
+        try {
+            socket = new Socket(SERVER_HOST, SERVER_PORT);
+            output = new PrintWriter(socket.getOutputStream(), true);
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // Identify as control panel
+            output.println("CONTROL_PANEL_CONNECT");
+            isRunning = true;
+            startListening();
+            Logger.info("Control panel connected to server");
+            return true;
+        } catch (IOException e) {
+            Logger.error("Could not connect to server: " + e.getMessage());
+            return false;
+        }
     }
-}
 
     private void startListening() {
         new Thread(() -> {
@@ -98,41 +98,41 @@ public boolean open() {
     }
 
     private void handleNodeInfo(String nodeInfo) {
-    try {
-        // Node info format: nodeId;actuatorCount_actuatorType,...
-        // Example: "1;2_window,1_heater"
-        String[] parts = nodeInfo.split(";");
-        if (parts.length >= 1) {
-            int nodeId = Integer.parseInt(parts[0]);
-            SensorActuatorNodeInfo info = new SensorActuatorNodeInfo(nodeId);
-            
-            // If there are actuator specifications
-            if (parts.length >= 2 && !parts[1].isEmpty()) {
-                String[] actuators = parts[1].split(",");
-                for (String actuator : actuators) {
-                    String[] actuatorParts = actuator.split("_");
-                    if (actuatorParts.length == 2) {
-                        try {
-                            int count = Integer.parseInt(actuatorParts[0]);
-                            String type = actuatorParts[1];
-                            // Create and add actuators of this type
-                            for (int i = 0; i < count; i++) {
-                                Actuator newActuator = new Actuator(type, nodeId);
-                                info.addActuator(newActuator);
+        try {
+            // Node info format: nodeId;actuatorCount_actuatorType,...
+            // Example: "1;2_window,1_heater"
+            String[] parts = nodeInfo.split(";");
+            if (parts.length >= 1) {
+                int nodeId = Integer.parseInt(parts[0]);
+                SensorActuatorNodeInfo info = new SensorActuatorNodeInfo(nodeId);
+
+                // If there are actuator specifications
+                if (parts.length >= 2 && !parts[1].isEmpty()) {
+                    String[] actuators = parts[1].split(",");
+                    for (String actuator : actuators) {
+                        String[] actuatorParts = actuator.split("_");
+                        if (actuatorParts.length == 2) {
+                            try {
+                                int count = Integer.parseInt(actuatorParts[0]);
+                                String type = actuatorParts[1];
+                                // Create and add actuators of this type
+                                for (int i = 0; i < count; i++) {
+                                    Actuator newActuator = new Actuator(type, nodeId);
+                                    info.addActuator(newActuator);
+                                }
+                            } catch (NumberFormatException e) {
+                                Logger.error("Invalid actuator count format: " + actuator);
                             }
-                        } catch (NumberFormatException e) {
-                            Logger.error("Invalid actuator count format: " + actuator);
                         }
                     }
                 }
+                Logger.info("Adding node: " + nodeId);
+                logic.onNodeAdded(info);
             }
-            Logger.info("Adding node: " + nodeId);
-            logic.onNodeAdded(info);
+        } catch (NumberFormatException e) {
+            Logger.error("Invalid node info format: " + nodeInfo);
         }
-    } catch (NumberFormatException e) {
-        Logger.error("Invalid node info format: " + nodeInfo);
     }
-}
 
     private void handleSensorData(String[] parts) {
         if (parts.length >= 3) {
@@ -140,7 +140,7 @@ public boolean open() {
                 int nodeId = Integer.parseInt(parts[1]);
                 String[] sensorReadings = parts[2].split(",");
                 List<SensorReading> readings = new ArrayList<>();
-                
+
                 for (String reading : sensorReadings) {
                     String[] readingParts = reading.split("=");
                     if (readingParts.length == 2) {
@@ -153,7 +153,7 @@ public boolean open() {
                         }
                     }
                 }
-                
+
                 logic.onSensorData(nodeId, readings);
             } catch (NumberFormatException e) {
                 Logger.error("Invalid sensor data format");

@@ -27,7 +27,7 @@ import no.ntnu.tools.Logger;
  * Run a control panel with a graphical user interface (GUI), with JavaFX.
  */
 public class ControlPanelApplication extends Application implements GreenhouseEventListener,
-    CommunicationChannelListener {
+        CommunicationChannelListener {
   private static ControlPanelLogic logic;
   private static final int WIDTH = 500;
   private static final int HEIGHT = 400;
@@ -62,7 +62,7 @@ public class ControlPanelApplication extends Application implements GreenhouseEv
   public void start(Stage stage) {
     if (channel == null) {
       throw new IllegalStateException(
-          "No communication channel. See the README on how to use fake event spawner!");
+              "No communication channel. See the README on how to use fake event spawner!");
     }
 
     stage.setMinWidth(WIDTH);
