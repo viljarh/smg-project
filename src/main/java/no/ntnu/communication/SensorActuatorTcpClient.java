@@ -155,7 +155,6 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
 
     @Override
     public void onNodeStopped(SensorActuatorNode node) {
-        // Implementation for when a node stops
         Logger.info("Node " + node.getId() + " has stopped.");
     }
 }

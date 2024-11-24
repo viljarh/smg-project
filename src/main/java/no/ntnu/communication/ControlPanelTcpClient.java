@@ -9,6 +9,8 @@ import no.ntnu.controlpanel.ControlPanelLogic;
 import no.ntnu.controlpanel.SensorActuatorNodeInfo;
 import no.ntnu.greenhouse.Actuator;
 import no.ntnu.greenhouse.SensorReading;
+import no.ntnu.message.ActuatorCommandMessage;
+import no.ntnu.message.MessageSerializer;
 import no.ntnu.tools.Logger;
 
 public class ControlPanelTcpClient implements CommunicationChannel {
@@ -30,7 +32,6 @@ public class ControlPanelTcpClient implements CommunicationChannel {
             socket = new Socket(SERVER_HOST, SERVER_PORT);
             output = new PrintWriter(socket.getOutputStream(), true);
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // Identify as control panel
             output.println("CONTROL_PANEL_CONNECT");
             isRunning = true;
             startListening();
@@ -63,15 +64,12 @@ public class ControlPanelTcpClient implements CommunicationChannel {
         if (parts.length >= 2) {
             switch (parts[0]) {
                 case "NODE_READY":
-                    // Handle node registration
                     handleNodeInfo(message.substring(message.indexOf(';') + 1));
                     break;
                 case "SENSOR_DATA":
-                    // Handle sensor updates
                     handleSensorData(parts);
                     break;
                 case "ACTUATOR_STATE":
-                    // Handle actuator state changes
                     handleActuatorState(parts);
                     break;
                 case "NODE_STOPPED":
@@ -91,33 +89,49 @@ public class ControlPanelTcpClient implements CommunicationChannel {
     }
 
     @Override
-    public void sendActuatorChange(int nodeId, int actuatorId, boolean isOn) {
-        if (output != null) {
-            output.println("ACTUATOR_COMMAND;" + nodeId + ";" + actuatorId + ";" + isOn);
-        }
+public void sendActuatorChange(int nodeId, int actuatorId, boolean isOn) {
+    if (output != null) {
+        String command = "ACTUATOR_COMMAND;" + nodeId + ";" + actuatorId + ";" + isOn;
+        output.println(command);
+        Logger.info("Control panel sending command: " + command);
+    } else {
+        Logger.error("Cannot send actuator command - no connection to server");
     }
+}
 
     private void handleNodeInfo(String nodeInfo) {
         try {
-            // Node info format: nodeId;actuatorCount_actuatorType,...
-            // Example: "1;2_window,1_heater"
             String[] parts = nodeInfo.split(";");
             if (parts.length >= 1) {
                 int nodeId = Integer.parseInt(parts[0]);
                 SensorActuatorNodeInfo info = new SensorActuatorNodeInfo(nodeId);
-
-                // If there are actuator specifications
+    
                 if (parts.length >= 2 && !parts[1].isEmpty()) {
                     String[] actuators = parts[1].split(",");
+                    int baseId = 1;
                     for (String actuator : actuators) {
                         String[] actuatorParts = actuator.split("_");
                         if (actuatorParts.length == 2) {
                             try {
                                 int count = Integer.parseInt(actuatorParts[0]);
                                 String type = actuatorParts[1];
-                                // Create and add actuators of this type
                                 for (int i = 0; i < count; i++) {
-                                    Actuator newActuator = new Actuator(type, nodeId);
+                                    int actuatorId;
+                                    switch(type) {
+                                        case "window": 
+                                            actuatorId = 2;
+                                            break;
+                                        case "fan":
+                                            actuatorId = 4 + i;
+                                            break;
+                                        case "heater":
+                                            actuatorId = 7;
+                                            break;
+                                        default:
+                                            actuatorId = baseId++;
+                                    }
+                                    Actuator newActuator = new Actuator(actuatorId, type, nodeId);
+                                    newActuator.setListener(logic);
                                     info.addActuator(newActuator);
                                 }
                             } catch (NumberFormatException e) {
