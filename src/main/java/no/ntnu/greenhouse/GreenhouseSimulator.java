@@ -28,8 +28,9 @@ public class GreenhouseSimulator {
     /**
      * Create a greenhouse simulator.
      *
-     * @param fake When true, simulate a fake periodic events instead of creating socket communication
-     * @param keyStorePath the path to the keystore file
+     * @param fake             When true, simulate a fake periodic events instead of
+     *                         creating socket communication
+     * @param keyStorePath     the path to the keystore file
      * @param keyStorePassword the password for the keystore
      */
     public GreenhouseSimulator(boolean fake, String keyStorePath, String keyStorePassword) {
@@ -64,7 +65,8 @@ public class GreenhouseSimulator {
     }
 
     /**
-     * Start a simulation of a greenhouse - all the sensor and actuator nodes inside it.
+     * Start a simulation of a greenhouse - all the sensor and actuator nodes inside
+     * it.
      */
     public void start() {
         Logger.info("GreenhouseSimulator.start() called");

@@ -11,8 +11,10 @@ public class GreenhouseGuiStarter {
     /**
      * Entrypoint for the Greenhouse GUI application.
      *
-     * @param args Command line arguments, only the first one of them used: when it is "fake",
-     *             emulate fake events, when it is either something else or not present,
+     * @param args Command line arguments, only the first one of them used: when it
+     *             is "fake",
+     *             emulate fake events, when it is either something else or not
+     *             present,
      *             use real socket communication.
      */
     public static void main(String[] args) {
@@ -22,11 +24,11 @@ public class GreenhouseGuiStarter {
             fake = true;
             Logger.info("Using FAKE events");
         }
-        
+
         Dotenv dotenv = Dotenv.load();
         String keyStorePath = dotenv.get("KEYSTORE_PATH");
         String keyStorePassword = dotenv.get("KEYSTORE_PASSWORD");
-        
+
         Logger.info("Launching GreenhouseApplication...");
         GreenhouseApplication.startApp(fake, keyStorePath, keyStorePassword);
     }

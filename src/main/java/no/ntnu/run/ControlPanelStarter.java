@@ -11,13 +11,15 @@ import no.ntnu.tools.Logger;
 
 /**
  * Starter class for the control panel.
- * Note: we could launch the Application class directly, but then we would have issues with the
+ * Note: we could launch the Application class directly, but then we would have
+ * issues with the
  * debugger (JavaFX modules not found)
  */
 public class ControlPanelStarter {
     private final boolean fake;
     private ControlPanelTcpClient client;
     private FakeCommunicationChannel spawner;
+
     /**
      * Instantiates a new Control panel starter.
      *
@@ -54,7 +56,8 @@ public class ControlPanelStarter {
         stopCommunication();
     }
 
-    private CommunicationChannel initiateCommunication(ControlPanelLogic logic, boolean fake, String keyStorePath, String keyStorePassword) {
+    private CommunicationChannel initiateCommunication(ControlPanelLogic logic, boolean fake, String keyStorePath,
+            String keyStorePassword) {
         CommunicationChannel channel;
         if (fake) {
             channel = initiateFakeSpawner(logic);
@@ -64,7 +67,8 @@ public class ControlPanelStarter {
         return channel;
     }
 
-    private CommunicationChannel initiateSocketCommunication(ControlPanelLogic logic, String keyStorePath, String keyStorePassword) {
+    private CommunicationChannel initiateSocketCommunication(ControlPanelLogic logic, String keyStorePath,
+            String keyStorePassword) {
         try {
             client = new ControlPanelTcpClient(logic, keyStorePath, keyStorePassword);
             logic.setCommunicationChannel(client);
@@ -76,7 +80,7 @@ public class ControlPanelStarter {
     }
 
     private CommunicationChannel initiateFakeSpawner(ControlPanelLogic logic) {
-         spawner = new FakeCommunicationChannel(logic);
+        spawner = new FakeCommunicationChannel(logic);
         logic.setCommunicationChannel(spawner);
         return spawner;
     }

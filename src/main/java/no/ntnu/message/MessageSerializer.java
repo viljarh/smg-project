@@ -29,16 +29,16 @@ public class MessageSerializer {
             if (s == null || s.isEmpty()) {
                 return new ErrorMessage("Empty message received");
             }
-            
+
             if (s.equals(CONTROL_PANEL_CONNECT)) {
                 return new ControlPanelConnectMessage();
             }
-            
+
             String[] parts = s.split(";");
             if (parts.length < 1) {
                 return new ErrorMessage("Invalid message format");
             }
-            
+
             return switch (parts[0]) {
                 case NODE_READY -> parseNodeReady(parts);
                 case SENSOR_DATA -> parseSensorData(parts);
@@ -64,9 +64,8 @@ public class MessageSerializer {
         }
         try {
             return new SensorDataMessage(
-                Integer.parseInt(parts[1]),
-                parts[2]
-            );
+                    Integer.parseInt(parts[1]),
+                    parts[2]);
         } catch (NumberFormatException e) {
             return new ErrorMessage("Invalid node ID in sensor data");
         }
@@ -78,10 +77,9 @@ public class MessageSerializer {
         }
         try {
             return new ActuatorCommandMessage(
-                Integer.parseInt(parts[1]),
-                Integer.parseInt(parts[2]),
-                Boolean.parseBoolean(parts[3])
-            );
+                    Integer.parseInt(parts[1]),
+                    Integer.parseInt(parts[2]),
+                    Boolean.parseBoolean(parts[3]));
         } catch (NumberFormatException e) {
             return new ErrorMessage("Invalid ID in actuator command");
         }
@@ -113,11 +111,11 @@ public class MessageSerializer {
         } else if (m instanceof SensorDataMessage msg) {
             return SENSOR_DATA + ";" + msg.getNodeId() + ";" + msg.getSensorData();
         } else if (m instanceof ActuatorCommandMessage msg) {
-            return ACTUATOR_COMMAND + ";" + msg.getNodeId() + ";" + 
-                   msg.getActuatorId() + ";" + msg.isOn();
+            return ACTUATOR_COMMAND + ";" + msg.getNodeId() + ";" +
+                    msg.getActuatorId() + ";" + msg.isOn();
         } else if (m instanceof ActuatorStateMessage msg) {
-            return ACTUATOR_STATE + ";" + msg.getNodeId() + ";" + 
-                   msg.getActuatorId() + ";" + msg.isOn();
+            return ACTUATOR_STATE + ";" + msg.getNodeId() + ";" +
+                    msg.getActuatorId() + ";" + msg.isOn();
         } else if (m instanceof ErrorMessage msg) {
             return ERROR + ";" + msg.getMessage();
         }
