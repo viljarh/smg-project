@@ -51,10 +51,12 @@ public class GreenhouseApplication extends Application implements NodeStateListe
      * Start the GUI Application.
      *
      * @param fake When true, emulate fake events instead of opening real sockets
+     * @param keyStorePath the path to the keystore file
+     * @param keyStorePassword the password for the keystore
      */
-    public static void startApp(boolean fake) {
+    public static void startApp(boolean fake, String keyStorePath, String keyStorePassword) {
         Logger.info("Running greenhouse simulator with JavaFX GUI...");
-        simulator = new GreenhouseSimulator(fake);
+        simulator = new GreenhouseSimulator(fake, keyStorePath, keyStorePassword);
         launch();
     }
 

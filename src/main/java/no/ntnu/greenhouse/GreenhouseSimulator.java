@@ -1,5 +1,6 @@
 package no.ntnu.greenhouse;
 
+import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,16 +22,26 @@ public class GreenhouseSimulator {
 
     private final List<PeriodicSwitch> periodicSwitches = new LinkedList<>();
     private final boolean fake;
+    private final String keyStorePath;
+    private final String keyStorePassword;
 
     /**
      * Create a greenhouse simulator.
      *
-     * @param fake When true, simulate a fake periodic events instead of creating             socket communication
+     * @param fake When true, simulate a fake periodic events instead of creating socket communication
+     * @param keyStorePath the path to the keystore file
+     * @param keyStorePassword the password for the keystore
      */
-    public GreenhouseSimulator(boolean fake) {
+    public GreenhouseSimulator(boolean fake, String keyStorePath, String keyStorePassword) {
         this.fake = fake;
+        this.keyStorePath = keyStorePath;
+        this.keyStorePassword = keyStorePassword;
         if (!fake) {
-            server = new TcpServer(nodes);
+            try {
+                server = new TcpServer(nodes, keyStorePath, keyStorePassword);
+            } catch (KeyStoreException e) {
+                Logger.error("Failed to initialize server: " + e.getMessage());
+            }
         }
     }
 
@@ -96,20 +107,24 @@ public class GreenhouseSimulator {
             }, "TCP-Server").start();
 
             for (SensorActuatorNode node : nodes.values()) {
-                SensorActuatorTcpClient client = new SensorActuatorTcpClient(node);
-                node.addSensorListener(client);
-                node.addStateListener(client);
-                node.addActuatorListener(client);
-                clients.add(client);
+                try {
+                    SensorActuatorTcpClient client = new SensorActuatorTcpClient(node, keyStorePath, keyStorePassword);
+                    node.addSensorListener(client);
+                    node.addStateListener(client);
+                    node.addActuatorListener(client);
+                    clients.add(client);
 
-                new Thread(() -> {
-                    try {
-                        client.start();
-                        Logger.info("Client started for node " + node.getId());
-                    } catch (Exception e) {
-                        Logger.error("Failed to start client for node " + node.getId() + ": " + e.getMessage());
-                    }
-                }, "TCP-Client-" + node.getId()).start();
+                    new Thread(() -> {
+                        try {
+                            client.start();
+                            Logger.info("Client started for node " + node.getId());
+                        } catch (Exception e) {
+                            Logger.error("Failed to start client for node " + node.getId() + ": " + e.getMessage());
+                        }
+                    }, "TCP-Client-" + node.getId()).start();
+                } catch (KeyStoreException e) {
+                    Logger.error("Failed to initialize client for node " + node.getId() + ": " + e.getMessage());
+                }
             }
         } else {
             Logger.error("Server not initialized");

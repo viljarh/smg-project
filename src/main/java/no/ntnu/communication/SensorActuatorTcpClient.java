@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,7 @@ import no.ntnu.listeners.common.ActuatorListener;
 import no.ntnu.listeners.greenhouse.NodeStateListener;
 import no.ntnu.listeners.greenhouse.SensorListener;
 import no.ntnu.tools.Logger;
+import no.ntnu.ssl.SslConnection;
 
 /**
  * The type Sensor actuator tcp client.
@@ -29,14 +33,18 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
     private PrintWriter output;
     private BufferedReader input;
     private boolean isRunning;
+    private final SslConnection sslConnection;
 
     /**
      * Instantiates a new Sensor actuator tcp client.
      *
      * @param node the node
+     * @param keyStorePath the path to the keystore file
+     * @param keyStorePassword the password for the keystore
      */
-    public SensorActuatorTcpClient(SensorActuatorNode node) {
+    public SensorActuatorTcpClient(SensorActuatorNode node, String keyStorePath, String keyStorePassword) throws KeyStoreException {
         this.node = node;
+        this.sslConnection = new SslConnection(SERVER_PORT, keyStorePath, keyStorePassword);
     }
 
     /**
@@ -44,14 +52,14 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
      */
     public void start() {
         try {
-            socket = new Socket(SERVER_HOST, SERVER_PORT);
+            socket = sslConnection.createClientSocket(SERVER_HOST);
             output = new PrintWriter(socket.getOutputStream(), true);
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             isRunning = true;
             sendNodeInfo();
             startListening();
             Logger.info("Node " + node.getId() + " connected to server");
-        } catch (IOException e) {
+        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException e) {
             Logger.error("Could not connect to server: " + e.getMessage());
         }
     }

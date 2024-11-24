@@ -2,6 +2,9 @@ package no.ntnu.communication;
 
 import java.io.*;
 import java.net.Socket;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import no.ntnu.controlpanel.CommunicationChannel;
@@ -9,9 +12,8 @@ import no.ntnu.controlpanel.ControlPanelLogic;
 import no.ntnu.controlpanel.SensorActuatorNodeInfo;
 import no.ntnu.greenhouse.Actuator;
 import no.ntnu.greenhouse.SensorReading;
-import no.ntnu.message.ActuatorCommandMessage;
-import no.ntnu.message.MessageSerializer;
 import no.ntnu.tools.Logger;
+import no.ntnu.ssl.SslConnection;
 
 /**
  * The type Control panel tcp client.
@@ -24,20 +26,24 @@ public class ControlPanelTcpClient implements CommunicationChannel {
     private BufferedReader input;
     private final ControlPanelLogic logic;
     private boolean isRunning;
+    private final SslConnection sslConnection;
 
     /**
      * Instantiates a new Control panel tcp client.
      *
      * @param logic the logic
+     * @param keyStorePath the path to the keystore file
+     * @param keyStorePassword the password for the keystore
      */
-    public ControlPanelTcpClient(ControlPanelLogic logic) {
+    public ControlPanelTcpClient(ControlPanelLogic logic, String keyStorePath, String keyStorePassword) throws KeyStoreException {
         this.logic = logic;
+        this.sslConnection = new SslConnection(SERVER_PORT, keyStorePath, keyStorePassword);
     }
 
     @Override
     public boolean open() {
         try {
-            socket = new Socket(SERVER_HOST, SERVER_PORT);
+            socket = sslConnection.createClientSocket(SERVER_HOST);
             output = new PrintWriter(socket.getOutputStream(), true);
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output.println("CONTROL_PANEL_CONNECT");
@@ -45,7 +51,7 @@ public class ControlPanelTcpClient implements CommunicationChannel {
             startListening();
             Logger.info("Control panel connected to server");
             return true;
-        } catch (IOException e) {
+        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException e) {
             Logger.error("Could not connect to server: " + e.getMessage());
             return false;
         }

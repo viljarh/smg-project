@@ -1,5 +1,6 @@
 package no.ntnu.run;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import no.ntnu.greenhouse.GreenhouseSimulator;
 import no.ntnu.tools.Logger;
 
@@ -21,7 +22,13 @@ public class CommandLineGreenhouse {
             fake = true;
             Logger.info("Using FAKE events");
         }
-        GreenhouseSimulator simulator = new GreenhouseSimulator(fake);
+        
+         // Load environment variables from .env file
+        Dotenv dotenv = Dotenv.load();
+        String keyStorePath = dotenv.get("KEYSTORE_PATH");
+        String keyStorePassword = dotenv.get("KEYSTORE_PASSWORD");
+        
+        GreenhouseSimulator simulator = new GreenhouseSimulator(fake, keyStorePath, keyStorePassword);
         simulator.initialize();
         simulator.start();
     }

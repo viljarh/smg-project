@@ -3,6 +3,10 @@ package no.ntnu.communication;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +15,7 @@ import java.util.Map;
 import no.ntnu.greenhouse.ActuatorCollection;
 import no.ntnu.greenhouse.SensorActuatorNode;
 import no.ntnu.tools.Logger;
+import no.ntnu.ssl.SslConnection;
 
 /**
  * The type Tcp server.
@@ -22,14 +27,18 @@ public class TcpServer {
     private final Map<Integer, SensorActuatorNode> nodes;
     private final List<ClientHandler> connectedClients = new ArrayList<>();
     private ServerSocket serverSocket;
+    private final SslConnection sslConnection;
 
     /**
      * Instantiates a new Tcp server.
      *
      * @param nodes the nodes
+     * @param keyStorePath the path to the keystore file
+     * @param keyStorePassword the password for the keystore
      */
-    public TcpServer(Map<Integer, SensorActuatorNode> nodes) {
+    public TcpServer(Map<Integer, SensorActuatorNode> nodes, String keyStorePath, String keyStorePassword) throws KeyStoreException {
         this.nodes = nodes;
+        this.sslConnection = new SslConnection(PORT_NUMBER, keyStorePath, keyStorePassword);
     }
 
     /**
@@ -37,14 +46,14 @@ public class TcpServer {
      */
     public void startServer() {
         try {
-            serverSocket = new ServerSocket(PORT_NUMBER);
+            serverSocket = sslConnection.createServerSocket();
             isServerRunning = true;
             Logger.info("Server listening on port " + PORT_NUMBER);
 
             while (isServerRunning) {
                 acceptNextClient();
             }
-        } catch (IOException e) {
+        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyManagementException e) {
             Logger.error("Could not start server: " + e.getMessage());
         }
     }

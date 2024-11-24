@@ -1,5 +1,6 @@
 package no.ntnu.run;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import no.ntnu.gui.greenhouse.GreenhouseApplication;
 import no.ntnu.tools.Logger;
 
@@ -8,7 +9,7 @@ import no.ntnu.tools.Logger;
  */
 public class GreenhouseGuiStarter {
     /**
-     * Entrypoint gor the Greenhouse GUI application.
+     * Entrypoint for the Greenhouse GUI application.
      *
      * @param args Command line arguments, only the first one of them used: when it is "fake",
      *             emulate fake events, when it is either something else or not present,
@@ -21,7 +22,13 @@ public class GreenhouseGuiStarter {
             fake = true;
             Logger.info("Using FAKE events");
         }
+        
+         // Load environment variables from .env file
+        Dotenv dotenv = Dotenv.load();
+        String keyStorePath = dotenv.get("KEYSTORE_PATH");
+        String keyStorePassword = dotenv.get("KEYSTORE_PASSWORD");
+        
         Logger.info("Launching GreenhouseApplication...");
-        GreenhouseApplication.startApp(fake);
+        GreenhouseApplication.startApp(fake, keyStorePath, keyStorePassword);
     }
 }

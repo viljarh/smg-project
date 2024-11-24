@@ -1,5 +1,7 @@
 package no.ntnu.run;
 
+import io.github.cdimascio.dotenv.Dotenv;
+import java.security.KeyStoreException;
 import no.ntnu.communication.ControlPanelTcpClient;
 import no.ntnu.controlpanel.CommunicationChannel;
 import no.ntnu.controlpanel.ControlPanelLogic;
@@ -41,27 +43,37 @@ public class ControlPanelStarter {
     }
 
     private void start() {
+        // Load environment variables from .env file
+        Dotenv dotenv = Dotenv.load();
+        String keyStorePath = dotenv.get("KEYSTORE_PATH");
+        String keyStorePassword = dotenv.get("KEYSTORE_PASSWORD");
+
         ControlPanelLogic logic = new ControlPanelLogic();
-        CommunicationChannel channel = initiateCommunication(logic, fake);
+        CommunicationChannel channel = initiateCommunication(logic, fake, keyStorePath, keyStorePassword);
         ControlPanelApplication.startApp(logic, channel);
         Logger.info("Exiting the control panel application");
         stopCommunication();
     }
 
-    private CommunicationChannel initiateCommunication(ControlPanelLogic logic, boolean fake) {
+    private CommunicationChannel initiateCommunication(ControlPanelLogic logic, boolean fake, String keyStorePath, String keyStorePassword) {
         CommunicationChannel channel;
         if (fake) {
             channel = initiateFakeSpawner(logic);
         } else {
-            channel = initiateSocketCommunication(logic);
+            channel = initiateSocketCommunication(logic, keyStorePath, keyStorePassword);
         }
         return channel;
     }
 
-    private CommunicationChannel initiateSocketCommunication(ControlPanelLogic logic) {
-        ControlPanelTcpClient client = new ControlPanelTcpClient(logic);
-        logic.setCommunicationChannel(client);
-        return client;
+    private CommunicationChannel initiateSocketCommunication(ControlPanelLogic logic, String keyStorePath, String keyStorePassword) {
+        try {
+            client = new ControlPanelTcpClient(logic, keyStorePath, keyStorePassword);
+            logic.setCommunicationChannel(client);
+            return client;
+        } catch (KeyStoreException e) {
+            Logger.error("Failed to initialize TCP client: " + e.getMessage());
+            return null;
+        }
     }
 
     private CommunicationChannel initiateFakeSpawner(ControlPanelLogic logic) {
