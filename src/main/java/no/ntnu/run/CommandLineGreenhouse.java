@@ -23,7 +23,6 @@ public class CommandLineGreenhouse {
             Logger.info("Using FAKE events");
         }
         
-         // Load environment variables from .env file
         Dotenv dotenv = Dotenv.load();
         String keyStorePath = dotenv.get("KEYSTORE_PATH");
         String keyStorePassword = dotenv.get("KEYSTORE_PASSWORD");
