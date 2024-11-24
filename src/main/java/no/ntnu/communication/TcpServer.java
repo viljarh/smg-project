@@ -12,6 +12,9 @@ import no.ntnu.greenhouse.ActuatorCollection;
 import no.ntnu.greenhouse.SensorActuatorNode;
 import no.ntnu.tools.Logger;
 
+/**
+ * The type Tcp server.
+ */
 public class TcpServer {
     public static final int PORT_NUMBER = 10025;
     private boolean isServerRunning;
@@ -20,10 +23,18 @@ public class TcpServer {
     private final List<ClientHandler> connectedClients = new ArrayList<>();
     private ServerSocket serverSocket;
 
+    /**
+     * Instantiates a new Tcp server.
+     *
+     * @param nodes the nodes
+     */
     public TcpServer(Map<Integer, SensorActuatorNode> nodes) {
         this.nodes = nodes;
     }
 
+    /**
+     * Start server.
+     */
     public void startServer() {
         try {
             serverSocket = new ServerSocket(PORT_NUMBER);
@@ -52,10 +63,18 @@ public class TcpServer {
         }
     }
 
+    /**
+     * Gets nodes.
+     *
+     * @return the nodes
+     */
     public Map<Integer, SensorActuatorNode> getNodes() {
         return nodes;
     }
 
+    /**
+     * Stop server.
+     */
     public void stopServer() {
         isServerRunning = false;
         try {
@@ -68,6 +87,11 @@ public class TcpServer {
         }
     }
 
+    /**
+     * Register control panel.
+     *
+     * @param client the client
+     */
     public void registerControlPanel(ClientHandler client) {
         controlPanelClients.add(client);
         for (SensorActuatorNode node : nodes.values()) {
@@ -99,12 +123,22 @@ public class TcpServer {
         return info.toString();
     }
 
+    /**
+     * Broadcast to control panels.
+     *
+     * @param message the message
+     */
     public void broadcastToControlPanels(String message) {
         for (ClientHandler client : controlPanelClients) {
             client.sendMessage(message);
         }
     }
 
+    /**
+     * Remove client.
+     *
+     * @param clientHandler the client handler
+     */
     public void removeClient(ClientHandler clientHandler) {
         connectedClients.remove(clientHandler);
     }

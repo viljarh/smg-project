@@ -16,10 +16,20 @@ public class ControlPanelStarter {
     private final boolean fake;
     private ControlPanelTcpClient client;
 
+    /**
+     * Instantiates a new Control panel starter.
+     *
+     * @param fake the fake
+     */
     public ControlPanelStarter(boolean fake) {
         this.fake = fake;
     }
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         boolean fake = false;
         if (args.length == 1 && "fake".equals(args[0])) {

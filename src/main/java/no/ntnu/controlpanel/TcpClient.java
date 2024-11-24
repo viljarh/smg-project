@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import no.ntnu.greenhouse.SensorReading;
 
+/**
+ * The type Tcp client.
+ */
 public class TcpClient implements CommunicationChannel {
   private Socket socket;
   private ObjectOutputStream outputStream;
@@ -16,6 +19,13 @@ public class TcpClient implements CommunicationChannel {
   private String serverHost;
   private int serverPort;
 
+  /**
+   * Instantiates a new Tcp client.
+   *
+   * @param logic      the logic
+   * @param serverHost the server host
+   * @param serverPort the server port
+   */
   public TcpClient(ControlPanelLogic logic, String serverHost, int serverPort) {
     this.logic = logic;
     this.serverHost = serverHost;
@@ -120,6 +130,9 @@ public class TcpClient implements CommunicationChannel {
     }
   }
 
+  /**
+   * Close.
+   */
   public void close() {
     try {
       if (socket != null) {

@@ -14,6 +14,9 @@ import no.ntnu.message.NodeReadyMessage;
 import no.ntnu.message.SensorDataMessage;
 import no.ntnu.tools.Logger;
 
+/**
+ * The type Client handler.
+ */
 public class ClientHandler extends Thread {
     private final Socket clientSocket;
     private final TcpServer server;
@@ -21,6 +24,14 @@ public class ClientHandler extends Thread {
     private final PrintWriter output;
     private final Map<Integer, SensorActuatorNode> nodes;
 
+    /**
+     * Instantiates a new Client handler.
+     *
+     * @param socket the socket
+     * @param server the server
+     * @param nodes  the nodes
+     * @throws IOException the io exception
+     */
     public ClientHandler(Socket socket, TcpServer server, Map<Integer, SensorActuatorNode> nodes) throws IOException {
         this.clientSocket = socket;
         this.server = server;
@@ -65,6 +76,11 @@ public class ClientHandler extends Thread {
         }
     }
 
+    /**
+     * Send message.
+     *
+     * @param message the message
+     */
     public void sendMessage(String message) {
         output.println(message);
     }

@@ -18,6 +18,9 @@ import no.ntnu.listeners.greenhouse.NodeStateListener;
 import no.ntnu.listeners.greenhouse.SensorListener;
 import no.ntnu.tools.Logger;
 
+/**
+ * The type Sensor actuator tcp client.
+ */
 public class SensorActuatorTcpClient implements SensorListener, NodeStateListener, ActuatorListener {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 10025;
@@ -27,10 +30,18 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
     private BufferedReader input;
     private boolean isRunning;
 
+    /**
+     * Instantiates a new Sensor actuator tcp client.
+     *
+     * @param node the node
+     */
     public SensorActuatorTcpClient(SensorActuatorNode node) {
         this.node = node;
     }
 
+    /**
+     * Start.
+     */
     public void start() {
         try {
             socket = new Socket(SERVER_HOST, SERVER_PORT);
@@ -137,6 +148,9 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
         }
     }
 
+    /**
+     * Stop.
+     */
     public void stop() {
         isRunning = false;
         try {

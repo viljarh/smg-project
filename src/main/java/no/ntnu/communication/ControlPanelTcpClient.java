@@ -13,6 +13,9 @@ import no.ntnu.message.ActuatorCommandMessage;
 import no.ntnu.message.MessageSerializer;
 import no.ntnu.tools.Logger;
 
+/**
+ * The type Control panel tcp client.
+ */
 public class ControlPanelTcpClient implements CommunicationChannel {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 10025;
@@ -22,6 +25,11 @@ public class ControlPanelTcpClient implements CommunicationChannel {
     private final ControlPanelLogic logic;
     private boolean isRunning;
 
+    /**
+     * Instantiates a new Control panel tcp client.
+     *
+     * @param logic the logic
+     */
     public ControlPanelTcpClient(ControlPanelLogic logic) {
         this.logic = logic;
     }
@@ -188,6 +196,9 @@ public void sendActuatorChange(int nodeId, int actuatorId, boolean isOn) {
         }
     }
 
+    /**
+     * Close.
+     */
     public void close() {
         isRunning = false;
         try {

@@ -25,8 +25,7 @@ public class GreenhouseSimulator {
     /**
      * Create a greenhouse simulator.
      *
-     * @param fake When true, simulate a fake periodic events instead of creating
-     *             socket communication
+     * @param fake When true, simulate a fake periodic events instead of creating             socket communication
      */
     public GreenhouseSimulator(boolean fake) {
         this.fake = fake;
@@ -81,6 +80,9 @@ public class GreenhouseSimulator {
         }
     }
 
+    /**
+     * Initiate real communication.
+     */
     public void initiateRealCommunication() {
         Logger.info("Initiating real communication");
         if (server != null) {
