@@ -15,7 +15,7 @@ import no.ntnu.tools.Logger;
 public class ControlPanelStarter {
     private final boolean fake;
     private ControlPanelTcpClient client;
-
+    private FakeCommunicationChannel spawner;
     /**
      * Instantiates a new Control panel starter.
      *
@@ -59,13 +59,13 @@ public class ControlPanelStarter {
     }
 
     private CommunicationChannel initiateSocketCommunication(ControlPanelLogic logic) {
-        ControlPanelTcpClient client = new ControlPanelTcpClient(logic);
+        client = new ControlPanelTcpClient(logic);
         logic.setCommunicationChannel(client);
         return client;
     }
 
     private CommunicationChannel initiateFakeSpawner(ControlPanelLogic logic) {
-        FakeCommunicationChannel spawner = new FakeCommunicationChannel(logic);
+         spawner = new FakeCommunicationChannel(logic);
         logic.setCommunicationChannel(spawner);
         return spawner;
     }
