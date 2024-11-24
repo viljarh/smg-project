@@ -70,7 +70,6 @@ public class TcpServer {
 
     public void registerControlPanel(ClientHandler client) {
         controlPanelClients.add(client);
-        // Send existing node information
         for (SensorActuatorNode node : nodes.values()) {
             String nodeInfo = formatNodeInfo(node);
             client.sendMessage("NODE_READY;" + nodeInfo);

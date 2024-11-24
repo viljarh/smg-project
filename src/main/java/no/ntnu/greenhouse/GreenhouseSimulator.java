@@ -82,7 +82,6 @@ public class GreenhouseSimulator {
     }
 
     public void initiateRealCommunication() {
-        // Start server in a separate thread
         Logger.info("Initiating real communication");
         if (server != null) {
             new Thread(() -> {
@@ -94,7 +93,6 @@ public class GreenhouseSimulator {
                 }
             }, "TCP-Server").start();
 
-            // Connect each node as a client
             for (SensorActuatorNode node : nodes.values()) {
                 SensorActuatorTcpClient client = new SensorActuatorTcpClient(node);
                 node.addSensorListener(client);
@@ -102,7 +100,6 @@ public class GreenhouseSimulator {
                 node.addActuatorListener(client);
                 clients.add(client);
 
-                // Start client connection in separate thread
                 new Thread(() -> {
                     try {
                         client.start();
@@ -138,17 +135,10 @@ public class GreenhouseSimulator {
                 periodicSwitch.stop();
             }
         } else {
-            // TODO - here you stop the TCP/UDP communication
-            // Stop all clients
             for (SensorActuatorTcpClient client : clients) {
                 client.stop();
             }
             clients.clear();
-
-            // Stop the server
-            if (server != null) {
-                server.stopServer();
-            }
         }
     }
 

@@ -5,6 +5,13 @@ import java.net.Socket;
 import java.util.Map;
 
 import no.ntnu.greenhouse.SensorActuatorNode;
+import no.ntnu.message.ActuatorCommandMessage;
+import no.ntnu.message.ActuatorStateMessage;
+import no.ntnu.message.ErrorMessage;
+import no.ntnu.message.Message;
+import no.ntnu.message.MessageSerializer;
+import no.ntnu.message.NodeReadyMessage;
+import no.ntnu.message.SensorDataMessage;
 import no.ntnu.tools.Logger;
 
 public class ClientHandler extends Thread {
@@ -37,25 +44,24 @@ public class ClientHandler extends Thread {
     }
 
     private void handleMessage(String message) {
-        String[] parts = message.split(";");
-        if (parts.length >= 1) {
-            switch (parts[0]) {
-                default:
-                    Logger.error("Unknown message type: " + parts[0]);
-                    break;
-                case "CONTROL_PANEL_CONNECT":
-                    server.registerControlPanel(this);
-                    break;
-                case "NODE_READY":
-                    server.broadcastToControlPanels(message);
-                    break;
-                case "SENSOR_DATA":
-                    server.broadcastToControlPanels(message);
-                    break;
-                case "ACTUATOR_STATE":
-                    server.broadcastToControlPanels(message);
-                    break;
+        Message msg = MessageSerializer.fromString(message);
+        if (msg instanceof NodeReadyMessage) {
+            server.broadcastToControlPanels(message);
+        } else if (msg instanceof SensorDataMessage) {
+            server.broadcastToControlPanels(message);
+        } else if (msg instanceof ActuatorStateMessage) {
+            server.broadcastToControlPanels(message);
+        } else if (msg instanceof ActuatorCommandMessage cmd) {
+            SensorActuatorNode node = nodes.get(cmd.getNodeId());
+            if (node != null) {
+                node.setActuator(cmd.getActuatorId(), cmd.isOn());
+                Logger.info("Received actuator command: node=" + cmd.isOn());
             }
+        } else if (message.equals(MessageSerializer.CONTROL_PANEL_CONNECT)) {
+            server.registerControlPanel(this);
+        } else if (msg instanceof ErrorMessage error) {
+            Logger.error(error.getMessage());
+            server.broadcastToControlPanels(MessageSerializer.toString(error));
         }
     }
 
