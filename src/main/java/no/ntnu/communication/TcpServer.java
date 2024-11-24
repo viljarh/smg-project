@@ -11,7 +11,6 @@ import no.ntnu.greenhouse.ActuatorCollection;
 import no.ntnu.greenhouse.SensorActuatorNode;
 import no.ntnu.tools.Logger;
 
-/** The type Tcp server. */
 public class TcpServer {
   public static final int PORT_NUMBER = 10025;
   private boolean isServerRunning;
@@ -141,4 +140,3 @@ public class TcpServer {
     connectedClients.remove(clientHandler);
   }
 }
-
