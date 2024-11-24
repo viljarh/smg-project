@@ -25,45 +25,48 @@ import no.ntnu.ssl.SslConnection;
  * The type Sensor actuator tcp client.
  */
 public class SensorActuatorTcpClient implements SensorListener, NodeStateListener, ActuatorListener {
-    private static final String SERVER_HOST = "localhost";
-    private static final int SERVER_PORT = 10025;
-    private final SensorActuatorNode node;
-    private Socket socket;
-    private PrintWriter output;
-    private BufferedReader input;
-    private boolean isRunning;
-    private final SslConnection sslConnection;
+  private static final String SERVER_HOST = "localhost";
+  private static final int SERVER_PORT = 10025;
+  private final SensorActuatorNode node;
+  private Socket socket;
+  private PrintWriter output;
+  private BufferedReader input;
+  private boolean isRunning;
+  private final SslConnection sslConnection;
 
-    /**
-     * Instantiates a new Sensor actuator tcp client.
-     *
-     * @param node the node
-     * @param keyStorePath the path to the keystore file
-     * @param keyStorePassword the password for the keystore
-     */
-    public SensorActuatorTcpClient(SensorActuatorNode node, String keyStorePath, String keyStorePassword) throws KeyStoreException {
-        this.node = node;
-        this.sslConnection = new SslConnection(SERVER_PORT, keyStorePath, keyStorePassword);
+  /**
+   * Instantiates a new Sensor actuator tcp client.
+   *
+   * @param node             the node
+   * @param keyStorePath     the path to the keystore file
+   * @param keyStorePassword the password for the keystore
+   */
+  public SensorActuatorTcpClient(SensorActuatorNode node, String keyStorePath, String keyStorePassword)
+      throws KeyStoreException {
+    this.node = node;
+    this.sslConnection = new SslConnection(SERVER_PORT, keyStorePath, keyStorePassword);
+  }
+
+  /**
+   * Start.
+   */
+  public void start() {
+    try {
+      socket = sslConnection.createClientSocket(SERVER_HOST);
+      output = new PrintWriter(socket.getOutputStream(), true);
+      input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      isRunning = true;
+      sendNodeInfo();
+      startListening();
+      Logger.info("Node " + node.getId() + " connected to server");
+    } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException e) {
+      Logger.error("Could not connect to server: " + e.getMessage());
     }
+  }
 
-    /**
-     * Start.
-     */
-    public void start() {
-        try {
-            socket = sslConnection.createClientSocket(SERVER_HOST);
-            output = new PrintWriter(socket.getOutputStream(), true);
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            isRunning = true;
-            sendNodeInfo();
-            startListening();
-            Logger.info("Node " + node.getId() + " connected to server");
-        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException e) {
-            Logger.error("Could not connect to server: " + e.getMessage());
-        }
-    }
-
-  /** Send the node information to the server indicating that the node is ready. */
+  /**
+   * Send the node information to the server indicating that the node is ready.
+   */
   private void sendNodeInfo() {
     StringBuilder nodeInfo = new StringBuilder();
     nodeInfo.append("NODE_READY;").append(node.getId());
@@ -90,19 +93,19 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
   /** Start listening to incoming messages from the server. */
   private void startListening() {
     new Thread(
-            () -> {
-              try {
-                String message;
-                while (isRunning && (message = input.readLine()) != null) {
-                  handleMessage(message);
-                }
-              } catch (IOException e) {
-                if (isRunning) {
-                  Logger.error("Error reading from server: " + e.getMessage());
-                }
-              }
-            },
-            "Client-Listener-" + node.getId())
+        () -> {
+          try {
+            String message;
+            while (isRunning && (message = input.readLine()) != null) {
+              handleMessage(message);
+            }
+          } catch (IOException e) {
+            if (isRunning) {
+              Logger.error("Error reading from server: " + e.getMessage());
+            }
+          }
+        },
+        "Client-Listener-" + node.getId())
         .start();
   }
 
@@ -144,14 +147,13 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
   /**
    * Handle actuator update and notify the server about it.
    *
-   * @param nodeId the ID of the node that contains the actuator
+   * @param nodeId   the ID of the node that contains the actuator
    * @param actuator the actuator being updated
    */
   @Override
   public void actuatorUpdated(int nodeId, Actuator actuator) {
     if (output != null) {
-      String message =
-          String.format("ACTUATOR_STATE;%d;%d;%b", nodeId, actuator.getId(), actuator.isOn());
+      String message = String.format("ACTUATOR_STATE;%d;%d;%b", nodeId, actuator.getId(), actuator.isOn());
       output.println(message);
       Logger.info("Node " + nodeId + " sent actuator update: " + message);
     }
@@ -210,4 +212,3 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
     Logger.info("Node " + node.getId() + " has stopped.");
   }
 }
-

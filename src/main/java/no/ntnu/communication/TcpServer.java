@@ -17,44 +17,48 @@ import no.ntnu.tools.Logger;
 import no.ntnu.ssl.SslConnection;
 
 public class TcpServer {
-    public static final int PORT_NUMBER = 10025;
-    private boolean isServerRunning;
-    private final List<ClientHandler> controlPanelClients = new ArrayList<>();
-    private final Map<Integer, SensorActuatorNode> nodes;
-    private final List<ClientHandler> connectedClients = new ArrayList<>();
-    private ServerSocket serverSocket;
-    private final SslConnection sslConnection;
+  public static final int PORT_NUMBER = 10025;
+  private boolean isServerRunning;
+  private final List<ClientHandler> controlPanelClients = new ArrayList<>();
+  private final Map<Integer, SensorActuatorNode> nodes;
+  private final List<ClientHandler> connectedClients = new ArrayList<>();
+  private ServerSocket serverSocket;
+  private final SslConnection sslConnection;
 
-    /**
-     * Instantiates a new Tcp server.
-     *
-     * @param nodes the nodes
-     * @param keyStorePath the path to the keystore file
-     * @param keyStorePassword the password for the keystore
-     */
-    public TcpServer(Map<Integer, SensorActuatorNode> nodes, String keyStorePath, String keyStorePassword) throws KeyStoreException {
-        this.nodes = nodes;
-        this.sslConnection = new SslConnection(PORT_NUMBER, keyStorePath, keyStorePassword);
+  /**
+   * Instantiates a new Tcp server.
+   *
+   * @param nodes            the nodes
+   * @param keyStorePath     the path to the keystore file
+   * @param keyStorePassword the password for the keystore
+   */
+  public TcpServer(Map<Integer, SensorActuatorNode> nodes, String keyStorePath, String keyStorePassword)
+      throws KeyStoreException {
+    this.nodes = nodes;
+    this.sslConnection = new SslConnection(PORT_NUMBER, keyStorePath, keyStorePassword);
+  }
+
+  /**
+   * Start server.
+   */
+  public void startServer() {
+    try {
+      serverSocket = sslConnection.createServerSocket();
+      isServerRunning = true;
+      Logger.info("Server listening on port " + PORT_NUMBER);
+
+      while (isServerRunning) {
+        acceptNextClient();
+      }
+    } catch (IOException | KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException
+        | KeyManagementException e) {
+      Logger.error("Could not start server: " + e.getMessage());
     }
+  }
 
-    /**
-     * Start server.
-     */
-    public void startServer() {
-        try {
-            serverSocket = sslConnection.createServerSocket();
-            isServerRunning = true;
-            Logger.info("Server listening on port " + PORT_NUMBER);
-
-            while (isServerRunning) {
-                acceptNextClient();
-            }
-        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyManagementException e) {
-            Logger.error("Could not start server: " + e.getMessage());
-        }
-    }
-
-  /** Accepts the next client connection and starts a new client handler for it. */
+  /**
+   * Accepts the next client connection and starts a new client handler for it.
+   */
   private void acceptNextClient() {
     try {
       Socket clientSocket = serverSocket.accept();
@@ -92,7 +96,8 @@ public class TcpServer {
   }
 
   /**
-   * Register control panel. Adds the given client to the control panel clients list and sends
+   * Register control panel. Adds the given client to the control panel clients
+   * list and sends
    * information about all nodes.
    *
    * @param client the client to register as a control panel
@@ -123,7 +128,8 @@ public class TcpServer {
 
       boolean first = true;
       for (Map.Entry<String, Integer> entry : actuatorCounts.entrySet()) {
-        if (!first) info.append(",");
+        if (!first)
+          info.append(",");
         info.append(entry.getValue()).append("_").append(entry.getKey());
         first = false;
       }
@@ -143,7 +149,8 @@ public class TcpServer {
   }
 
   /**
-   * Remove client. Removes the given client handler from the list of connected clients.
+   * Remove client. Removes the given client handler from the list of connected
+   * clients.
    *
    * @param clientHandler the client handler to remove
    */

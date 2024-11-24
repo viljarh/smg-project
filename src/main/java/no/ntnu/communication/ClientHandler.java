@@ -26,7 +26,7 @@ public class ClientHandler extends Thread {
    *
    * @param socket the socket
    * @param server the server
-   * @param nodes the nodes
+   * @param nodes  the nodes
    * @throws IOException the io exception
    */
   public ClientHandler(Socket socket, TcpServer server, Map<Integer, SensorActuatorNode> nodes)
@@ -99,4 +99,3 @@ public class ClientHandler extends Thread {
     }
   }
 }
-

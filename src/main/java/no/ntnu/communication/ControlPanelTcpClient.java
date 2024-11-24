@@ -17,61 +17,62 @@ import no.ntnu.ssl.SslConnection;
 
 /** The type Control panel tcp client. */
 public class ControlPanelTcpClient implements CommunicationChannel {
-    private static final String SERVER_HOST = "localhost";
-    private static final int SERVER_PORT = 10025;
-    private Socket socket;
-    private PrintWriter output;
-    private BufferedReader input;
-    private final ControlPanelLogic logic;
-    private boolean isRunning;
-    private final SslConnection sslConnection;
+  private static final String SERVER_HOST = "localhost";
+  private static final int SERVER_PORT = 10025;
+  private Socket socket;
+  private PrintWriter output;
+  private BufferedReader input;
+  private final ControlPanelLogic logic;
+  private boolean isRunning;
+  private final SslConnection sslConnection;
 
-    /**
-     * Instantiates a new Control panel tcp client.
-     *
-     * @param logic the logic
-     * @param keyStorePath the path to the keystore file
-     * @param keyStorePassword the password for the keystore
-     */
-    public ControlPanelTcpClient(ControlPanelLogic logic, String keyStorePath, String keyStorePassword) throws KeyStoreException {
-        this.logic = logic;
-        this.sslConnection = new SslConnection(SERVER_PORT, keyStorePath, keyStorePassword);
-    }
+  /**
+   * Instantiates a new Control panel tcp client.
+   *
+   * @param logic            the logic
+   * @param keyStorePath     the path to the keystore file
+   * @param keyStorePassword the password for the keystore
+   */
+  public ControlPanelTcpClient(ControlPanelLogic logic, String keyStorePath, String keyStorePassword)
+      throws KeyStoreException {
+    this.logic = logic;
+    this.sslConnection = new SslConnection(SERVER_PORT, keyStorePath, keyStorePassword);
+  }
 
-    @Override
-    public boolean open() {
-        try {
-            socket = sslConnection.createClientSocket(SERVER_HOST);
-            output = new PrintWriter(socket.getOutputStream(), true);
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            output.println("CONTROL_PANEL_CONNECT");
-            isRunning = true;
-            startListening();
-            Logger.info("Control panel connected to server");
-            return true;
-        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException e) {
-            Logger.error("Could not connect to server: " + e.getMessage());
-            return false;
-        }
+  @Override
+  public boolean open() {
+    try {
+      socket = sslConnection.createClientSocket(SERVER_HOST);
+      output = new PrintWriter(socket.getOutputStream(), true);
+      input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      output.println("CONTROL_PANEL_CONNECT");
+      isRunning = true;
+      startListening();
+      Logger.info("Control panel connected to server");
+      return true;
+    } catch (IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException e) {
+      Logger.error("Could not connect to server: " + e.getMessage());
+      return false;
     }
+  }
 
   /** Start listening to incoming messages from the server. */
   private void startListening() {
     new Thread(
-            () -> {
-              try {
-                String message;
-                while (isRunning && (message = input.readLine()) != null) {
-                  handleMessage(message);
-                }
-              } catch (IOException e) {
-                if (isRunning) {
-                  Logger.error("Error reading from server: " + e.getMessage());
-                  logic.onCommunicationChannelClosed();
-                }
-              }
-            },
-            "ControlPanel-Listener")
+        () -> {
+          try {
+            String message;
+            while (isRunning && (message = input.readLine()) != null) {
+              handleMessage(message);
+            }
+          } catch (IOException e) {
+            if (isRunning) {
+              Logger.error("Error reading from server: " + e.getMessage());
+              logic.onCommunicationChannelClosed();
+            }
+          }
+        },
+        "ControlPanel-Listener")
         .start();
   }
 
@@ -112,9 +113,9 @@ public class ControlPanelTcpClient implements CommunicationChannel {
   /**
    * Send actuator change command to the server.
    *
-   * @param nodeId the ID of the node
+   * @param nodeId     the ID of the node
    * @param actuatorId the ID of the actuator
-   * @param isOn true if the actuator is to be turned on, false otherwise
+   * @param isOn       true if the actuator is to be turned on, false otherwise
    */
   @Override
   public void sendActuatorChange(int nodeId, int actuatorId, boolean isOn) {
@@ -243,4 +244,3 @@ public class ControlPanelTcpClient implements CommunicationChannel {
     }
   }
 }
-

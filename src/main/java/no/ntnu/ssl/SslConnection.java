@@ -30,8 +30,8 @@ public class SslConnection {
   /**
    * Creates an ssl connection.
    *
-   * @param portNumber the port for the server.
-   * @param keyStorePath the path to the keystore file.
+   * @param portNumber       the port for the server.
+   * @param keyStorePath     the path to the keystore file.
    * @param keyStorePassword the password for the keystore.
    * @throws KeyStoreException exception.
    */
@@ -54,13 +54,14 @@ public class SslConnection {
    * Returns the ssl socket for the server.
    *
    * @return Server ssl socket.
-   * @throws KeyStoreException keystore exception.
-   * @throws NoSuchAlgorithmException no such algorithm.
+   * @throws KeyStoreException         keystore exception.
+   * @throws NoSuchAlgorithmException  no such algorithm.
    * @throws UnrecoverableKeyException unrecoverable key exception.
-   * @throws KeyManagementException key management exception.
-    * @throws IOException 
-      */
-     public SSLServerSocket createServerSocket() throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException, IOException {
+   * @throws KeyManagementException    key management exception.
+   * @throws IOException
+   */
+  public SSLServerSocket createServerSocket() throws KeyStoreException, NoSuchAlgorithmException,
+      UnrecoverableKeyException, KeyManagementException, IOException {
     KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
     keyManagerFactory.init(this.keyStore, this.keyStorePass);
 
@@ -76,13 +77,14 @@ public class SslConnection {
    *
    * @param address the server address.
    * @return the client SSL socket.
-   * @throws KeyStoreException keystore exception.
+   * @throws KeyStoreException        keystore exception.
    * @throws NoSuchAlgorithmException no such algorithm.
-   * @throws KeyManagementException key management exception.
- * @throws IOException 
- * @throws UnknownHostException 
+   * @throws KeyManagementException   key management exception.
+   * @throws IOException
+   * @throws UnknownHostException
    */
-  public SSLSocket createClientSocket(String address) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
+  public SSLSocket createClientSocket(String address)
+      throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
     TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
     trustManagerFactory.init(this.keyStore);
 
