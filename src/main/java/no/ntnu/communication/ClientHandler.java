@@ -15,7 +15,12 @@ import no.ntnu.message.SensorDataMessage;
 import no.ntnu.message.TurnOffAllActuatorsMessage;
 import no.ntnu.tools.Logger;
 
-/** The type Client handler. */
+/**
+ * The ClientHandler class manages the communication between the server and a
+ * connected client.
+ * It handles receiving and processing messages from the client and sending
+ * responses back.
+ */
 public class ClientHandler extends Thread {
   private final Socket clientSocket;
   private final TcpServer server;
@@ -24,12 +29,13 @@ public class ClientHandler extends Thread {
   private final Map<Integer, SensorActuatorNode> nodes;
 
   /**
-   * Instantiates a new Client handler.
+   * Constructs a new ClientHandler.
    *
-   * @param socket the socket
-   * @param server the server
-   * @param nodes  the nodes
-   * @throws IOException the io exception
+   * @param socket the socket connected to the client
+   * @param server the server instance
+   * @param nodes  the map of sensor-actuator nodes
+   * @throws IOException if an I/O error occurs when creating the input or output
+   *                     streams
    */
   public ClientHandler(Socket socket, TcpServer server, Map<Integer, SensorActuatorNode> nodes)
       throws IOException {
@@ -40,7 +46,10 @@ public class ClientHandler extends Thread {
     this.output = new PrintWriter(socket.getOutputStream(), true);
   }
 
-  /** Handles incoming client messages and processes them accordingly. */
+  /**
+   * Handles incoming client messages and processes them accordingly.
+   * This method runs in a separate thread.
+   */
   @Override
   public void run() {
     try {
@@ -115,7 +124,9 @@ private void handleError(ErrorMessage error) {
     output.println(message);
   }
 
-  /** Closes the connection to the client. */
+  /**
+   * Closes the connection to the client.
+   */
   private void closeConnection() {
     try {
       server.removeClient(this);

@@ -22,7 +22,10 @@ import no.ntnu.tools.Logger;
 import no.ntnu.ssl.SslConnection;
 
 /**
- * The type Sensor actuator tcp client.
+ * The SensorActuatorTcpClient class manages the TCP connection between a
+ * sensor-actuator node and the server.
+ * It handles sending and receiving messages, including sensor data and actuator
+ * commands.
  */
 public class SensorActuatorTcpClient implements SensorListener, NodeStateListener, ActuatorListener {
   private static final String SERVER_HOST = "localhost";
@@ -35,11 +38,12 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
   private final SslConnection sslConnection;
 
   /**
-   * Instantiates a new Sensor actuator tcp client.
+   * Constructs a new SensorActuatorTcpClient.
    *
-   * @param node             the node
-   * @param keyStorePath     the path to the keystore file
+   * @param node             the sensor-actuator node
+   * @param keyStorePath     the path to the keystore file for SSL connection
    * @param keyStorePassword the password for the keystore
+   * @throws KeyStoreException if there is an issue with the keystore
    */
   public SensorActuatorTcpClient(SensorActuatorNode node, String keyStorePath, String keyStorePassword)
       throws KeyStoreException {
@@ -48,7 +52,7 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
   }
 
   /**
-   * Start.
+   * Starts the client and connects to the server.
    */
   public void start() {
     try {
@@ -90,7 +94,9 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
     Logger.info("Node " + node.getId() + " sent ready notification: " + nodeInfo);
   }
 
-  /** Start listening to incoming messages from the server. */
+  /**
+   * Starts a new thread to listen for incoming messages from the server.
+   */
   private void startListening() {
     new Thread(
         () -> {
@@ -180,7 +186,9 @@ public class SensorActuatorTcpClient implements SensorListener, NodeStateListene
     }
   }
 
-  /** Stop the client and close the connection to the server. */
+  /**
+   * Stops the client and closes the connection to the server.
+   */
   public void stop() {
     isRunning = false;
     try {

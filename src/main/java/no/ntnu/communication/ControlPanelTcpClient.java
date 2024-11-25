@@ -15,7 +15,12 @@ import no.ntnu.greenhouse.SensorReading;
 import no.ntnu.tools.Logger;
 import no.ntnu.ssl.SslConnection;
 
-/** The type Control panel tcp client. */
+/**
+ * The ControlPanelTcpClient class manages the TCP connection between the
+ * control panel and the server.
+ * It handles sending and receiving messages, including actuator commands and
+ * sensor data.
+ */
 public class ControlPanelTcpClient implements CommunicationChannel {
   private static final String SERVER_HOST = "localhost";
   private static final int SERVER_PORT = 10025;
@@ -27,11 +32,12 @@ public class ControlPanelTcpClient implements CommunicationChannel {
   private final SslConnection sslConnection;
 
   /**
-   * Instantiates a new Control panel tcp client.
+   * Constructs a new ControlPanelTcpClient.
    *
-   * @param logic            the logic
-   * @param keyStorePath     the path to the keystore file
+   * @param logic            the logic handler for the control panel
+   * @param keyStorePath     the path to the keystore file for SSL connection
    * @param keyStorePassword the password for the keystore
+   * @throws KeyStoreException if there is an issue with the keystore
    */
   public ControlPanelTcpClient(ControlPanelLogic logic, String keyStorePath, String keyStorePassword)
       throws KeyStoreException {
@@ -39,6 +45,11 @@ public class ControlPanelTcpClient implements CommunicationChannel {
     this.sslConnection = new SslConnection(SERVER_PORT, keyStorePath, keyStorePassword);
   }
 
+  /**
+   * Opens the connection to the server.
+   *
+   * @return true if the connection is successfully opened, false otherwise
+   */
   @Override
   public boolean open() {
     try {
@@ -56,7 +67,9 @@ public class ControlPanelTcpClient implements CommunicationChannel {
     }
   }
 
-  /** Start listening to incoming messages from the server. */
+  /**
+   * Starts a new thread to listen for incoming messages from the server.
+   */
   private void startListening() {
     new Thread(
         () -> {
@@ -77,7 +90,7 @@ public class ControlPanelTcpClient implements CommunicationChannel {
   }
 
   /**
-   * Handle incoming messages from the server.
+   * Handles incoming messages from the server.
    *
    * @param message the message received from the server
    */
@@ -111,7 +124,7 @@ public class ControlPanelTcpClient implements CommunicationChannel {
   }
 
   /**
-   * Send actuator change command to the server.
+   * Sends an actuator change command to the server.
    *
    * @param nodeId     the ID of the node
    * @param actuatorId the ID of the actuator
@@ -136,7 +149,7 @@ public class ControlPanelTcpClient implements CommunicationChannel {
 }
 
   /**
-   * Handle the node information message.
+   * Handles the node information message received from the server.
    *
    * @param nodeInfo the information about the node in the message
    */
@@ -239,7 +252,9 @@ public class ControlPanelTcpClient implements CommunicationChannel {
     }
   }
 
-  /** Close the connection to the server. */
+  /**
+   * Closes the connection to the server.
+   */
   public void close() {
     isRunning = false;
     try {

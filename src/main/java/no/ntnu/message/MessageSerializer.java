@@ -56,6 +56,12 @@ public class MessageSerializer {
         }
     }
 
+    /**
+     * Parses a NODE_READY message.
+     *
+     * @param parts the parts of the message
+     * @return the parsed message or an error message if the format is invalid
+     */
     private static Message parseNodeReady(String[] parts) {
         if (parts.length < 2) {
             return new ErrorMessage("Invalid NODE_READY format");
@@ -63,6 +69,12 @@ public class MessageSerializer {
         return new NodeReadyMessage(parts[1]);
     }
 
+    /**
+     * Parses a SENSOR_DATA message.
+     *
+     * @param parts the parts of the message
+     * @return the parsed message or an error message if the format is invalid
+     */
     private static Message parseSensorData(String[] parts) {
         if (parts.length < 3) {
             return new ErrorMessage("Invalid SENSOR_DATA format");
@@ -76,6 +88,12 @@ public class MessageSerializer {
         }
     }
 
+    /**
+     * Parses an ACTUATOR_COMMAND message.
+     *
+     * @param parts the parts of the message
+     * @return the parsed message or an error message if the format is invalid
+     */
     private static Message parseActuatorCommand(String[] parts) {
         if (parts.length < 4) {
             return new ErrorMessage("Invalid ACTUATOR_COMMAND format");
@@ -90,6 +108,12 @@ public class MessageSerializer {
         }
     }
 
+    /**
+     * Parses an ACTUATOR_STATE message.
+     *
+     * @param parts the parts of the message
+     * @return the parsed message or an error message if the format is invalid
+     */
     public static Message parseActuatorState(String[] parts) {
         if (parts.length < 4) {
             return new ErrorMessage("Invalid actuator state message format");
