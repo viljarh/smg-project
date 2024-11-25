@@ -16,6 +16,12 @@ import no.ntnu.greenhouse.SensorActuatorNode;
 import no.ntnu.tools.Logger;
 import no.ntnu.ssl.SslConnection;
 
+/**
+ * The TcpServer class manages the TCP server that handles connections from
+ * sensor-actuator nodes and control panels.
+ * It handles accepting client connections, managing connected clients, and
+ * broadcasting messages to control panels.
+ */
 public class TcpServer {
   public static final int PORT_NUMBER = 10025;
   private boolean isServerRunning;
@@ -26,11 +32,12 @@ public class TcpServer {
   private final SslConnection sslConnection;
 
   /**
-   * Instantiates a new Tcp server.
+   * Instantiates a new TcpServer.
    *
-   * @param nodes            the nodes
+   * @param nodes            the map of sensor-actuator nodes
    * @param keyStorePath     the path to the keystore file
    * @param keyStorePassword the password for the keystore
+   * @throws KeyStoreException if there is an issue with the keystore
    */
   public TcpServer(Map<Integer, SensorActuatorNode> nodes, String keyStorePath, String keyStorePassword)
       throws KeyStoreException {
@@ -39,7 +46,7 @@ public class TcpServer {
   }
 
   /**
-   * Start server.
+   * Starts the server and begins listening for client connections.
    */
   public void startServer() {
     try {
@@ -74,15 +81,17 @@ public class TcpServer {
   }
 
   /**
-   * Gets nodes.
+   * Gets the map of sensor-actuator nodes.
    *
-   * @return the nodes
+   * @return the map of sensor-actuator nodes
    */
   public Map<Integer, SensorActuatorNode> getNodes() {
     return nodes;
   }
 
-  /** Stop server. Stops the server and disconnects all connected clients. */
+  /**
+   * Stops the server and disconnects all connected clients.
+   */
   public void stopServer() {
     isServerRunning = false;
     try {
@@ -96,9 +105,7 @@ public class TcpServer {
   }
 
   /**
-   * Register control panel. Adds the given client to the control panel clients
-   * list and sends
-   * information about all nodes.
+   * Registers a control panel client and sends information about all nodes to it.
    *
    * @param client the client to register as a control panel
    */
