@@ -59,7 +59,7 @@ public class NodeGuiWindow extends Stage implements SensorListener, ActuatorList
     }
 
     private Parent createContent() {
-        actuatorPane = new ActuatorPane(node.getActuators());
+        actuatorPane = new ActuatorPane(node.getActuators(), null);
         sensorPane = new SensorPane(node.getSensors());
         return new VBox(sensorPane, actuatorPane);
     }

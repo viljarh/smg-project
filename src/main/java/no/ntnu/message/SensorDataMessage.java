@@ -1,5 +1,8 @@
 package no.ntnu.message;
 
+/**
+ * Message sent from a node to the server containing sensor data.
+ */
 public class SensorDataMessage implements Message {
     private final int nodeId;
     private final String sensorData;

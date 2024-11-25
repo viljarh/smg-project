@@ -6,11 +6,13 @@ import java.util.Map;
 import no.ntnu.greenhouse.SensorActuatorNode;
 import no.ntnu.message.ActuatorCommandMessage;
 import no.ntnu.message.ActuatorStateMessage;
+import no.ntnu.message.ControlPanelConnectMessage;
 import no.ntnu.message.ErrorMessage;
 import no.ntnu.message.Message;
 import no.ntnu.message.MessageSerializer;
 import no.ntnu.message.NodeReadyMessage;
 import no.ntnu.message.SensorDataMessage;
+import no.ntnu.message.TurnOffAllActuatorsMessage;
 import no.ntnu.tools.Logger;
 
 /** The type Client handler. */
@@ -60,25 +62,49 @@ public class ClientHandler extends Thread {
    */
   private void handleMessage(String message) {
     Message msg = MessageSerializer.fromString(message);
-    if (msg instanceof NodeReadyMessage) {
-      server.broadcastToControlPanels(message);
+    handleMessageByType(msg, message);
+}
+
+private void handleMessageByType(Message msg, String originalMessage) {
+    if (msg instanceof TurnOffAllActuatorsMessage) {
+        handleTurnOffAll();
+    } else if (msg instanceof NodeReadyMessage) {
+        server.broadcastToControlPanels(originalMessage);
     } else if (msg instanceof SensorDataMessage) {
-      server.broadcastToControlPanels(message);
+        server.broadcastToControlPanels(originalMessage);
     } else if (msg instanceof ActuatorStateMessage) {
-      server.broadcastToControlPanels(message);
+        server.broadcastToControlPanels(originalMessage);
     } else if (msg instanceof ActuatorCommandMessage cmd) {
-      SensorActuatorNode node = nodes.get(cmd.getNodeId());
-      if (node != null) {
-        node.setActuator(cmd.getActuatorId(), cmd.isOn());
-        Logger.info("Received actuator command: node=" + cmd.isOn());
-      }
-    } else if (message.equals(MessageSerializer.CONTROL_PANEL_CONNECT)) {
-      server.registerControlPanel(this);
+        handleActuatorCommand(cmd);
+    } else if (msg instanceof ControlPanelConnectMessage) {
+        server.registerControlPanel(this);
     } else if (msg instanceof ErrorMessage error) {
-      Logger.error(error.getMessage());
-      server.broadcastToControlPanels(MessageSerializer.toString(error));
+        handleError(error);
+    } else {
+        Logger.error("Unknown message type: " + msg.getType());
     }
-  }
+}
+
+  private void handleTurnOffAll() {
+    for (SensorActuatorNode node : nodes.values()) {
+        node.setAllActuators(false);
+    }
+}
+
+  private void handleActuatorCommand(ActuatorCommandMessage cmd) {
+    SensorActuatorNode node = nodes.get(cmd.getNodeId());
+    if (node != null) {
+        node.setActuator(cmd.getActuatorId(), cmd.isOn());
+        Logger.info("Received actuator command: node=" + cmd.getNodeId() + 
+                   ", actuator=" + cmd.getActuatorId() + 
+                   ", state=" + cmd.isOn());
+    }
+}
+
+private void handleError(ErrorMessage error) {
+  Logger.error(error.getMessage());
+  server.broadcastToControlPanels(MessageSerializer.toString(error));
+}
 
   /**
    * Sends a message to the connected client.

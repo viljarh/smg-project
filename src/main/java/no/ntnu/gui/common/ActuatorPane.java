@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
@@ -22,14 +23,16 @@ import no.ntnu.greenhouse.ActuatorCollection;
 public class ActuatorPane extends TitledPane {
   private final Map<Actuator, SimpleStringProperty> actuatorValue = new HashMap<>();
   private final Map<Actuator, SimpleBooleanProperty> actuatorActive = new HashMap<>();
+  private final Button toggleAllButton;
 
   /**
    * Create an actuator pane.
    *
    * @param actuators A list of actuators to display in the pane.
    */
-  public ActuatorPane(ActuatorCollection actuators) {
+  public ActuatorPane(ActuatorCollection actuators, Button toggleAllButton) {
     super();
+    this.toggleAllButton = toggleAllButton;
     setText("Actuators");
     VBox vbox = new VBox();
     vbox.setSpacing(10);
@@ -37,6 +40,10 @@ public class ActuatorPane extends TitledPane {
     addActuatorControls(actuators, vbox);
     GuiTools.stretchVertically(this);
   }
+
+  public Button getToggleAllButton() {
+        return toggleAllButton;
+    }
 
   private void addActuatorControls(ActuatorCollection actuators, Pane parent) {
     actuators.forEach(actuator ->

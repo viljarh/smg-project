@@ -7,6 +7,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -16,6 +17,7 @@ import no.ntnu.controlpanel.CommunicationChannel;
 import no.ntnu.controlpanel.ControlPanelLogic;
 import no.ntnu.controlpanel.SensorActuatorNodeInfo;
 import no.ntnu.greenhouse.Actuator;
+import no.ntnu.greenhouse.ActuatorCollection;
 import no.ntnu.greenhouse.SensorReading;
 import no.ntnu.gui.common.ActuatorPane;
 import no.ntnu.gui.common.SensorPane;
@@ -122,28 +124,6 @@ public class ControlPanelApplication extends Application implements GreenhouseEv
     }
   }
 
-  @Override
-  public void onActuatorStateChanged(int nodeId, int actuatorId, boolean isOn) {
-    String state = isOn ? "ON" : "off";
-    Logger.info("actuator[" + actuatorId + "] on node " + nodeId + " is " + state);
-    ActuatorPane actuatorPane = actuatorPanes.get(nodeId);
-    if (actuatorPane != null) {
-      Actuator actuator = getStoredActuator(nodeId, actuatorId);
-      if (actuator != null) {
-        if (isOn) {
-          actuator.turnOn();
-        } else {
-          actuator.turnOff();
-        }
-        actuatorPane.update(actuator);
-      } else {
-        Logger.error(" actuator not found");
-      }
-    } else {
-      Logger.error("No actuator section for node " + nodeId);
-    }
-  }
-
   private Actuator getStoredActuator(int nodeId, int actuatorId) {
     Actuator actuator = null;
     SensorActuatorNodeInfo nodeInfo = nodeInfos.get(nodeId);
@@ -179,15 +159,71 @@ public class ControlPanelApplication extends Application implements GreenhouseEv
   }
 
   private Tab createNodeTab(SensorActuatorNodeInfo nodeInfo) {
-    Tab tab = new Tab("Node " + nodeInfo.getId());
+    VBox content = new VBox(10);
+  
+    Button toggleAllButton = new Button("Turn On All Actuators");
+    ActuatorCollection actuators = nodeInfo.getActuators();
+    updateToggleButtonText(toggleAllButton, actuators);
+    
+    toggleAllButton.setOnAction(e -> {
+        boolean shouldTurnOn = !hasAnyActuatorOn(actuators);
+        for (Actuator actuator : actuators) {
+            actuator.set(shouldTurnOn);
+            logic.actuatorUpdated(nodeInfo.getId(), actuator);
+        }
+        updateToggleButtonText(toggleAllButton, actuators);
+    });
+  
     SensorPane sensorPane = createEmptySensorPane();
     sensorPanes.put(nodeInfo.getId(), sensorPane);
-    ActuatorPane actuatorPane = new ActuatorPane(nodeInfo.getActuators());
+    ActuatorPane actuatorPane = new ActuatorPane(nodeInfo.getActuators(), toggleAllButton); // Pass button to ActuatorPane
     actuatorPanes.put(nodeInfo.getId(), actuatorPane);
-    tab.setContent(new VBox(sensorPane, actuatorPane));
+    
+    content.getChildren().addAll(sensorPane, actuatorPane, toggleAllButton);
+    
+    Tab tab = new Tab("Node " + nodeInfo.getId());
+    tab.setContent(content);
     nodeTabs.put(nodeInfo.getId(), tab);
     return tab;
+}
+
+private void updateToggleButtonText(Button button, ActuatorCollection actuators) {
+  Platform.runLater(() -> {
+      button.setText(hasAnyActuatorOn(actuators) ? 
+          "Turn Off All Actuators" : "Turn On All Actuators");
+  });
+}
+
+@Override
+public void onActuatorStateChanged(int nodeId, int actuatorId, boolean isOn) {
+  Logger.info("actuator[" + actuatorId + "] on node " + nodeId + " is " + (isOn ? "ON" : "off"));
+  ActuatorPane actuatorPane = actuatorPanes.get(nodeId);
+  if (actuatorPane != null) {
+      Actuator actuator = getStoredActuator(nodeId, actuatorId);
+      if (actuator != null) {
+          if (isOn) {
+              actuator.turnOn();
+          } else {
+              actuator.turnOff();
+          }
+          actuatorPane.update(actuator);
+          updateToggleButtonText(actuatorPane.getToggleAllButton(), nodeInfos.get(nodeId).getActuators());
+      } else {
+          Logger.error("actuator not found");
+      }
+  } else {
+      Logger.error("No actuator section for node " + nodeId);
   }
+}
+
+private boolean hasAnyActuatorOn(ActuatorCollection actuators) {
+  for (Actuator actuator : actuators) {
+      if (actuator.isOn()) {
+          return true;
+      }
+  }
+  return false;
+}
 
   private static SensorPane createEmptySensorPane() {
     return new SensorPane();

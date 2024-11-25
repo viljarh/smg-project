@@ -128,6 +128,13 @@ public class ControlPanelTcpClient implements CommunicationChannel {
     }
   }
 
+  public void sendTurnOffAllActuators() {
+    if (output != null) {
+        output.println("TURN_OFF_ALL");
+        Logger.info("Control panel sending turn off all command");
+    }
+}
+
   /**
    * Handle the node information message.
    *

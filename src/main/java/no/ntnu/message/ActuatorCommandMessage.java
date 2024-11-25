@@ -1,5 +1,8 @@
 package no.ntnu.message;
 
+/**
+ * Message sent to the server to turn an actuator on or off.
+ */
 public class ActuatorCommandMessage implements Message {
     private final int nodeId;
     private final int actuatorId;

@@ -1,5 +1,8 @@
 package no.ntnu.message;
 
+/**
+ * Message sent from a node to the server to update the state of an actuator.
+ */
 public class ActuatorStateMessage implements Message {
     private final int nodeId;
     private final int actuatorId;

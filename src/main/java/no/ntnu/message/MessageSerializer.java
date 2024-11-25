@@ -11,6 +11,7 @@ public class MessageSerializer {
     public static final String ACTUATOR_COMMAND = "ACTUATOR_COMMAND";
     public static final String NODE_STOPPED = "NODE_STOPPED";
     public static final String ERROR = "ERROR";
+    public static final String TURN_OFF_ALL = "TURN_OFF_ALL";
 
     /**
      * Not allowed to instantiate this utility class.
@@ -37,6 +38,10 @@ public class MessageSerializer {
             String[] parts = s.split(";");
             if (parts.length < 1) {
                 return new ErrorMessage("Invalid message format");
+            }
+
+            if (s.equals(TURN_OFF_ALL)) {
+                return new TurnOffAllActuatorsMessage();
             }
 
             return switch (parts[0]) {
