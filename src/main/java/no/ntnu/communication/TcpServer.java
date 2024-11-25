@@ -93,6 +93,7 @@ public class TcpServer {
    * Stops the server and disconnects all connected clients.
    */
   public void stopServer() {
+    Logger.info("Shutting down server...");
     isServerRunning = false;
     try {
       if (serverSocket != null && !serverSocket.isClosed()) {

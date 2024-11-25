@@ -102,7 +102,6 @@ public class GreenhouseSimulator {
             new Thread(() -> {
                 try {
                     server.startServer();
-                    Logger.info("Server started on port " + TcpServer.PORT_NUMBER);
                 } catch (Exception e) {
                     Logger.error("Failed to start server: " + e.getMessage());
                 }
@@ -158,6 +157,7 @@ public class GreenhouseSimulator {
                 client.stop();
             }
             clients.clear();
+                server.stopServer();
         }
     }
 
