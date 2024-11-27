@@ -28,10 +28,6 @@ To run the control panel (only GUI-version is available):
 
 - Run the `main` method inside the [`ControlPanelStarter`](src/main/java/no/ntnu/run/ControlPanelStarter.java) class.
 
-### Simulating Events
-
-If you want to simulate fake communication (just some periodic events happening), you can run both the greenhouse and control panel parts with a command line parameter `fake`. Check out classes in the [`no.ntnu.run`](src/main/java/no/ntnu/run) package for more details.
-
 ## Communication Protocol
 
 The communication protocol used in this project is described in detail in the [protocol.md](protocol.md) file. It includes information about the message formats, flow of information, and the underlying transport protocol.
