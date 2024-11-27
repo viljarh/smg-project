@@ -108,18 +108,6 @@ The server keeps track of all connected nodes and control panels, maintaining th
 
 ## An example scenario
 
-1. A sensor node with ID=1 is started. It has a temperature sensor, two humidity sensors. It can
-   also open a window.
-2. A sensor node with ID=2 is started. It has a single temperature sensor and can control two fans
-   and a heater.
-3. A control panel node is started.
-4. Another control panel node is started.
-5. A sensor node with ID=3 is started. It has a two temperature sensors and no actuators.
-6. After 5 seconds all three sensor/actuator nodes broadcast their sensor data.
-7. The user of the first-control panel presses on the button "ON" for the first fan of
-   sensor/actuator node with ID=2.
-8. The user of the second control-panel node presses on the button "turn off all actuators".
-
 1. Start up of simulator and server.
 * The user starts the simulator which starts the server.
 2. Startup of Sensor-Actuator Nodes
@@ -133,7 +121,7 @@ The server keeps track of all connected nodes and control panels, maintaining th
 * Control panels update their interfaces to display available nodes and actuators.
 5. Every 5 seconds, each sensor-actuator node sends SENSOR_DATA message to the server:e.g.: SENSOR_DATA;1;temperature=27.74 °C,humidity=79.08 %
 * The server forwards these messages to all control panels.
-* Control panels displat the updated sensor readings.
+* Control panels display the updated sensor readings.
 6. User Interaction on Control Panel
 * The user decides to turn ON the first fan on Node 2.
 * Control panel sends an ACTUATOR_COMMAND message to the server: ACTUATOR_COMMAND;2;4;true
