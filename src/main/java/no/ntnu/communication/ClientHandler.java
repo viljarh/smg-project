@@ -72,48 +72,70 @@ public class ClientHandler extends Thread {
   private void handleMessage(String message) {
     Message msg = MessageSerializer.fromString(message);
     handleMessageByType(msg, message);
-}
+  }
 
-private void handleMessageByType(Message msg, String originalMessage) {
+  /**
+   * Processes the message based on its specific type.
+   *
+   * @param msg             the parsed message object
+   * @param originalMessage the original message string
+   */
+  private void handleMessageByType(Message msg, String originalMessage) {
     if (msg instanceof TurnOffAllActuatorsMessage) {
-        handleTurnOffAll();
+      handleTurnOffAll();
     } else if (msg instanceof NodeReadyMessage) {
-        server.broadcastToControlPanels(originalMessage);
+      server.broadcastToControlPanels(originalMessage);
     } else if (msg instanceof SensorDataMessage) {
-        server.broadcastToControlPanels(originalMessage);
+      server.broadcastToControlPanels(originalMessage);
     } else if (msg instanceof ActuatorStateMessage) {
-        server.broadcastToControlPanels(originalMessage);
+      server.broadcastToControlPanels(originalMessage);
     } else if (msg instanceof ActuatorCommandMessage cmd) {
-        handleActuatorCommand(cmd);
+      handleActuatorCommand(cmd);
     } else if (msg instanceof ControlPanelConnectMessage) {
-        server.registerControlPanel(this);
+      server.registerControlPanel(this);
     } else if (msg instanceof ErrorMessage error) {
-        handleError(error);
+      handleError(error);
     } else {
-        Logger.error("Unknown message type: " + msg.getType());
+      Logger.error("Unknown message type: " + msg.getType());
     }
-}
+  }
 
+  /**
+   * Handles the TurnOffAllActuatorsMessage by turning off all actuators in all
+   * nodes.
+   */
   private void handleTurnOffAll() {
     for (SensorActuatorNode node : nodes.values()) {
-        node.setAllActuators(false);
+      node.setAllActuators(false);
     }
-}
+  }
 
+  /**
+   * Handles the ActuatorCommandMessage by setting the state of the specified
+   * actuator.
+   *
+   * @param cmd the actuator command message
+   */
   private void handleActuatorCommand(ActuatorCommandMessage cmd) {
     SensorActuatorNode node = nodes.get(cmd.getNodeId());
     if (node != null) {
-        node.setActuator(cmd.getActuatorId(), cmd.isOn());
-        Logger.info("Received actuator command: node=" + cmd.getNodeId() + 
-                   ", actuator=" + cmd.getActuatorId() + 
-                   ", state=" + cmd.isOn());
+      node.setActuator(cmd.getActuatorId(), cmd.isOn());
+      Logger.info("Received actuator command: node=" + cmd.getNodeId() +
+          ", actuator=" + cmd.getActuatorId() +
+          ", state=" + cmd.isOn());
     }
-}
+  }
 
-private void handleError(ErrorMessage error) {
-  Logger.error(error.getMessage());
-  server.broadcastToControlPanels(MessageSerializer.toString(error));
-}
+  /**
+   * Handles the ErrorMessage by logging the error and broadcasting it to control
+   * panels.
+   *
+   * @param error the error message
+   */
+  private void handleError(ErrorMessage error) {
+    Logger.error(error.getMessage());
+    server.broadcastToControlPanels(MessageSerializer.toString(error));
+  }
 
   /**
    * Sends a message to the connected client.
