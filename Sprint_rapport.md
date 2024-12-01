@@ -48,11 +48,31 @@
 
     Dato : 18. November - 25. November
     Plan :
+    - Update GUI and implement the check boxes so it send information to actuators.
+    - Update acutautors states between server and controlpanel nodes.
+    - Write in protocol.md file, to answer the question when each have time.
+
+    - Start to prepere for the presentation. 
 
     What have been done:
+    - Updated the GUI and implemented the check boxes so it send information to actuators.
+    so now we can check off a box in a controlpanel, and it will respons in the node gui, and vise versa.
+
 
     Approach:
+    - We tried seperatly to work on the GUI to implement the checkboxes, and then we met
+    up to discuss where we found a solution to how to implement it. 
+
+    Until next sprint:
+    - Implement extra features to the project where we feel like can improve the prjoject.
+    - Fix so the server stop when exiting greenhouse application window. 
+
+    
 
 ### Sprint 4
 
     Dato : 25. November - 2. December
+
+    Plan : 
+    - Finish the project
+    - Make the video for the presentation
