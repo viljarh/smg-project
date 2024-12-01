@@ -55,7 +55,7 @@
     - Start to prepere for the presentation. 
 
     What have been done:
-    - Updated the GUI and implemented the check boxes so it send information to actuators.
+    - Gaute Updated the GUI and implemented the check boxes so it send information to actuators.
     so now we can check off a box in a controlpanel, and it will respons in the node gui, and vise versa.
 
 
@@ -66,6 +66,7 @@
     Until next sprint:
     - Implement extra features to the project where we feel like can improve the prjoject.
     - Fix so the server stop when exiting greenhouse application window. 
+    - Chech over the code to see if there is anything missing.
 
     
 
@@ -74,5 +75,18 @@
     Dato : 25. November - 2. December
 
     Plan : 
+    - Implement SSL
     - Finish the project
     - Make the video for the presentation
+
+    Approach:
+    - We finished the project, where Eirik implemented SSL, so the communication between the nodes is secure.
+    - Thomas made the video for the presentation.
+    - Viljar has made the javadoc more clear and readable
+
+    Retrospective : 
+    - We think that we have done a good job about the project, where we also have added som extra features to the project.
+    We have communicated good in the group, where we have tried to help and discuss the problems we have encounted.
+    We had the most problem to understand how everything worked together, but when we sat down together we found it easier to understand what each component did, and let everyone have the same understanding of what we were going to do.
+
+    What we though were a good solution, where to use live-coding, so everyone could see what was happening, and we could discuss it together. Gaute and Viljar had a good understanding of the project, where they had the most control of the programming, where Eirik and Thomas helped discussed the problems and helped with possible solutions.
